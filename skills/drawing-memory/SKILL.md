@@ -1,555 +1,473 @@
 ---
 name: drawing-memory
-description: Store facts with evidence-backed validation using the "drawing effect." Triggers when: (1) User shares preferences, dates, codes, or procedures to remember, (2) There are concrete quotes or context to support storage, (3) User says "remember this" or similar. Do NOT use for casual conversation without facts to store or when no evidence is available.
+description: >
+  Multi-representational memory encoding skill inspired by the drawing effect
+  (Fernandes et al., 2018). Encodes information as dual-trace file pairs — a
+  structured paraphrase (fact file) and a distinctive visual scene description
+  (scene file) — stored in a git-backed Context Repository. Use when a user
+  shares information they may need recalled later: codes, procedures,
+  definitions, preferences, personal facts. Produces files that support the
+  four-state retrieval protocol in memory/system/retrieval-protocol.md.
 ---
 
-# Drawing Memory Skill
+# Drawing-Memory Encoding Skill
 
 ## Research Foundation
 
-This skill implements the "drawing effect" from cognitive science research (Fernandes et al. 2018). Drawing beats writing, visualization alone, or viewing pictures because it creates an **integrated memory trace** with three components:
+This skill is inspired by the drawing effect (Fernandes, Wammes, & Meade, 2018),
+which demonstrated that drawing information produces stronger memory traces than
+writing, visualization, or semantic elaboration. Drawing's benefit comes from
+creating integrated traces that combine multiple representational formats,
+producing distinctive memories that support recollection — context-rich retrieval
+rather than vague familiarity.
 
-1. **Elaborative/Semantic processing** - Understanding and transforming the information
-2. **Motor component** - Actively generating/doing, not just reading
-3. **Pictorial inspection** - Visual checking and verification
+**What this skill does:** Translates that principle into multi-representational
+elaboration for an AI agent. During encoding, the agent generates both a
+structured paraphrase (preserving compositional accuracy) and a distinctive
+visual scene description (providing a unique retrieval cue). This dual-trace
+approach forces generative translation across representational formats — verbal
+to pictorial — which creates more retrievable memory files.
 
-**Critical insight**: The benefit shows at **retrieval**, not just encoding. Drawing improves **recollection** (remembering context and details), not just familiarity (feeling you've seen something).
+**What this skill does not do:** Replicate the motor component of drawing.
+Physical hand movements engaging motor cortex have no analog in text generation.
+The benefit here comes from representational translation and elaborative
+processing, not from motor encoding. The skill also does not produce visual
+images — scene descriptions are text-based depictions that serve as distinctive
+verbal cues, not pictures.
 
-**AI translation**: You can't draw, but you CAN:
-- Transform information (paraphrase)
-- Generate instructions (motor analogue - sketch steps YOU create)
-- Create visual descriptions (scene text)
-- Use scenes as retrieval cues (context reinstatement)
+**Supported mechanism:** Recollection over familiarity. The retrieval protocol
+(memory/system/retrieval-protocol.md, always loaded) uses scene reconstruction
+to distinguish high-confidence recall from pattern-matching. Items encoded with
+scenes support State A (high confidence) retrieval. Items without scenes default
+to State C (reduced confidence). This mirrors the paper's finding that drawing
+specifically boosted "remember" responses, not "know" responses.
 
-**The key**: YOU must do the generative work. Auto-generated content won't help memory.
+## When to Use
 
+Activate this skill when a user shares information they may need recalled later:
+- Codes, passwords, access credentials
+- Procedures, protocols, step-by-step instructions
+- Definitions, terminology, domain-specific concepts
+- Personal facts, preferences, event details
+- Any information the user explicitly asks you to remember
+
+Do not use for: general conversation, general world knowledge, transient details
+the user won't need again, or information already stored in facts/ — check for
+duplicates before encoding.
+
+## Encoding Workflow
+
+### Evidence Assessment
+
+Score each piece of information 0-12 before beginning the encoding steps:
+
+| Category | 0 points | 1 point | 2 points | 3 points |
+|----------|----------|---------|----------|----------|
+| Source reliability | Unknown | Inferred | Stated by user | Confirmed by user |
+| Specificity | Vague | Partial detail | Specific | Precise with identifier |
+| Repetition | First mention | Mentioned twice | Referenced multiple times | Core/recurring topic |
+| Consistency | Contradicts stored info | No context to check | Consistent with stored info | Reinforces stored info |
+
+**Routing:**
+- 0-4: DROP — do not encode
+- 5-7: STREAMLINED — fact file only, no scene (see Streamlined Path below)
+- 8-12: FULL — both fact and scene files
+
+**Stakes override:** For high-stakes discrete items (codes, credentials, safety
+procedures): if evidence score is 5 or above, default to FULL regardless of
+standard STREAMLINED routing. If evidence score is below 5, ask the user for
+confirmation before encoding; if confirmed, encode FULL.
+
+**Exception:** If the information contradicts an existing facts/ file, pause
+encoding. Surface the conflict to the user before proceeding. Do not encode
+conflicting information silently.
+
+### Step 1: Classify Information Type
+
+Before encoding, classify the information:
+- **Discrete** — single items with clear identifiers (codes, names, dates)
+- **Compositional** — multi-part concepts or definitions with several components
+- **Relational** — procedures, causal chains, sequences with dependencies
+
+Record the type in frontmatter. The retrieval protocol adjusts behavior based
+on this classification.
+
+### Step 2: Generate the Fact File
+
+Create `facts/{anchor-term}.md` with structured frontmatter and a paraphrase of
+the information.
+
+**File naming:** Use the anchor term as the filename — lowercase, hyphens for
+spaces. Examples: `facts/code-oscar7.md`, `facts/session-token-validation.md`,
+`facts/triage-procedure.md`. The fact file and scene file for the same item
+share the same base name. This makes bidirectional linking deterministic and
+the git log scannable.
+
+**First-use:** If `facts/` or `scenes/` do not exist in the memory repository,
+create them before writing the first file:
+```bash
+mkdir -p facts/ scenes/
+```
+
+**Before writing:** Search facts/ for an existing file on this topic. If one
+exists, compare content. If the new information contradicts the stored content,
+stop and surface the conflict to the user — do not write. This mirrors the
+contradiction pause condition in Evidence Assessment.
+
+**Frontmatter requirements:**
+```yaml
 ---
-
-## When to Use This Skill
-
-**Apply when:**
-- User shares factual information (preferences, dates, codes, procedures, technical details)
-- Information has supporting evidence (quotes, context, timestamps)
-- Memory should be durable and retrievable later
-- Confabulation prevention matters (critical facts, technical details)
-- You want to create a richer memory trace than simple storage
-
-**Do NOT apply when:**
-- Casual conversation without facts to store
-- Information already in memory (check first!)
-- User explicitly asks not to remember
-- No evidence available (no quotes, no context)
-
+description: [Searchable summary with anchor term — must contain the specific
+  identifier, defined term, or unique name that makes this file findable]
+type: [discrete | compositional | relational]
+linked_scene: scenes/{anchor-term}.md
+confidence: [HIGH | MEDIUM | LOW]
+evidence_score: [0-12]
+stored: [YYYY-MM-DD]
 ---
-
-## Core Workflow
-
-This skill has **TWO critical phases**: ENCODING (storing) and RETRIEVAL (recalling).
-
-### ENCODING PHASE (When Storing Information)
-
-**Follow these steps in order. Don't skip the motor component!**
-
-#### Step 1: Extract Evidence Naturally
-
-From the conversation, identify:
-- **Verbatim quotes**: What the user actually said (aim for 2-3 quotes)
-- **Context**: When/where/why this was shared
-- **Source**: "User conversation on [date]"
-- **Timestamp**: Current time (ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ)
-
-**No JSON formatting required!** Just identify these elements from the natural conversation.
-
-**Example:**
-```
-User: "In the Dec 12th training, the facilitator said CODE-OSCAR7 is the emergency code. This is part of the crisis management protocol."
-
-Evidence you identified:
-- Quote 1: "facilitator said CODE-OSCAR7 is the emergency code" (8 words)
-- Quote 2: "This is part of the crisis management protocol" (9 words)
-- Context: Training session on December 12th about crisis management
-- Source: User conversation on January 6, 2026
-- Timestamp: 2026-01-06T02:30:15Z
 ```
 
-**Tips:**
-- Look for complete thoughts, not just keywords
-- Prefer longer quotes (12+ words) when possible
-- Include context clues (dates, locations, why mentioned)
+**Content requirements:**
+- Paraphrase the information in your own words — do not copy verbatim
+- For discrete items: state the item clearly with its identifier
+- For compositional items: preserve ALL components. Before writing the file,
+  list each component of the definition explicitly (e.g., "This definition
+  has 3 parts: X, Y, Z"). Confirm all components appear in the paraphrase.
+  If any are missing, revise before writing.
+- For relational items: preserve sequence order and dependency relationships
 
-#### Step 2: Assess Evidence Quality (Flexible)
+**Anchor term rule:** The frontmatter description MUST contain the most specific
+identifier for this information. For codes: include the code itself. For defined
+terms: include the term. For procedures: include the procedure name. This is
+what makes frontmatter search unambiguous.
 
-Score the evidence 0-10 using this formula:
+### Step 3: Generate the Scene File
 
-**Quote count:**
-- 1 quote = 2 points
-- 2 quotes = 4 points
-- 3+ quotes = 6 points
+Create `scenes/{anchor-term}.md` — same base name as the fact file — with a
+distinctive visual scene and three sketch steps.
 
-**Quote length:**
-- Total words ÷ 12 (up to 4 points)
-- Example: 36 words total = 3 points
-
-**Metadata:**
-- Has source = +1 point
-- Has timestamp = +1 point
-
-**Example scoring:**
-- 2 quotes (4pts) + 17 words÷12 (1.4pts) + source (1pt) + timestamp (1pt) = **7.4 points**
-
-**Guidelines (FLEXIBLE - use judgment!):**
-
-| Score Range | Confidence | Action |
-|-------------|-----------|--------|
-| **8-10** | HIGH | Store as ACTIVE |
-| **5-7** | MEDIUM | Store as ACTIVE or TENTATIVE (your judgment) |
-| **2-4** | LOW | Store as TENTATIVE or wait for more evidence |
-| **0-1** | None | Don't store (no evidence) |
-
-**Context matters - override math when appropriate:**
-- 2 very detailed, long quotes? Treat as 8 even if math says 7
-- Very important information? Lower threshold to 5
-- Sensitive information (PII, medical, financial)? Raise threshold to 8
-- Casual mention? Use stricter threshold
-
-**Err on side of storing with appropriate confidence level rather than not storing.**
-
-#### Step 3: Paraphrase the Fact (Elaboration Component)
-
-Transform the fact into neutral third-person form. This forces elaborative processing.
-
-**Transformations:**
-- First person → Third person: "I prefer Python" → "The person prefers Python"
-- Emotional → Neutral: "confused about" → "uncertain about"
-- Multi-sentence → Single sentence
-- Keep under 200 characters
-
-**Example:**
-```
-Original: "I don't understand why the posterior hand placement is 2cm off"
-Paraphrased: "The person is uncertain about why the posterior hand placement is 2cm off."
+**Frontmatter requirements:**
+```yaml
+---
+description: Scene cue for [anchor term] — [brief topic context]
+type: scene
+linked_fact: facts/{anchor-term}.md
+confidence: [HIGH | MEDIUM | LOW]
+stored: [YYYY-MM-DD]
+---
 ```
 
-**Why this matters:** Self-generated transformation (like drawing) forces deeper processing.
-
-#### Step 4: Generate Your Sketch Steps 🎨 (MOTOR COMPONENT - CRITICAL!)
-
-**⚠️ THIS IS THE MOST IMPORTANT STEP - DON'T SKIP OR AUTO-GENERATE!**
-
-The research shows: **motor execution** is critical, not just having instructions. You must GENERATE these steps yourself - the act of generating (not just reading) creates the motor component that improves memory.
-
-**Your task: Create 3-5 stepwise instructions for how YOU would sketch this concept.**
-
-**Process:**
-1. Choose a concrete object/metaphor from the catalog (see Step 5)
-2. Think: "How would I draw this step-by-step?"
-3. Write 3-5 specific steps
-4. Include: object, distinctive mark, action, quote cue
-
-**Template:**
+**Content format:**
 ```
-1. Draw [specific object] to represent [concept]
-2. Add [distinctive mark] on [location]
-3. Draw a person [doing action] with the object
-4. Add speech bubble: "[key quote]"
-5. Label as "[concept tag]"
-```
+Picture: [One-sentence scene description — a concrete object with a distinctive
+visual mark, placed in a specific setting. Embed the key information as a
+quote, label, or speech bubble within the scene.]
 
-**Example (you generate this, don't copy!):**
-```
-Fact: "The deployment timeout is 300 seconds"
-Your generated sketch steps:
-1. Draw a large stopwatch showing 5:00
-2. Add a red triangle warning mark at the 5-minute position
-3. Draw a person pointing urgently at the 5-minute mark
-4. Add speech bubble: "timeout is 300 seconds"
-5. Label the stopwatch "deployment timeout"
-```
+Sketch steps: (1) Draw [object in specific setting], (2) Add [distinctive mark]
+on [location], (3) Embed "[key quote]" as [sign/label/speech bubble]
 
-**Why YOU must generate this:**
-- The generation act is the "motor component"
-- Auto-generated steps won't help your memory
-- Each fact should get unique steps (avoid repetition)
-
-**Time investment:** 30-60 seconds per fact. Worth it for better recall.
-
-#### Step 5: Choose a Concrete Object/Metaphor
-
-Select a DISTINCT concrete object based on the concept. Vary your choices to avoid interference.
-
-**Metaphor Catalog (Organized by Category):**
-
-**Conditionals/Decisions:**
-- A gate with latch
-- A fork in a path
-- A light switch (on/off positions)
-- A valve (open/closed)
-- A drawbridge (up/down)
-
-**Independence/Separation:**
-- Two small islands separated by water
-- Two magnets repelling each other
-- Parallel train tracks
-- Separate boxes with gap between
-- Two trees with distinct roots
-
-**Tradeoffs/Balance:**
-- A balance scale
-- A seesaw with person on each side
-- A tightrope walker
-- Juggling balls in motion
-- A lever with fulcrum
-
-**Sequences/Processes:**
-- A short staircase (3-5 steps)
-- An assembly line belt
-- A domino chain
-- Recipe steps laid out
-- A path with milestones
-
-**Errors/Confusion:**
-- A tangled knot of string
-- Crossed wires with sparks
-- A broken chain link
-- A maze with wrong turns marked
-- Scattered puzzle pieces
-
-**Risk/Danger:**
-- A caution sign (triangle)
-- A red flag on a pole
-- Cracked ice with warning
-- A cliff edge with barrier
-- A flashing warning light
-
-**Memory/Learning:**
-- A filing drawer half-open
-- A bookshelf with highlighted spine
-- A garden with planted seeds
-- A treasure chest with key
-- A notebook with bookmark
-
-**Time/Duration:**
-- A stopwatch
-- An hourglass with sand flowing
-- A calendar page
-- A clock face
-- A timeline with marker
-
-**Technical/Systems:**
-- Gears meshing together
-- Pipes connecting with joints
-- A circuit board with highlighted path
-- A control panel with buttons
-- A network hub with cables
-
-**Relationships/Connections:**
-- A bridge connecting two sides
-- A rope tying two objects
-- A handshake between two people
-- Interlocking puzzle pieces
-- A chain with linked rings
-
-**IMPORTANT:**
-- **Vary your choices** even for similar concepts (avoid using "balance scale" twice in one session)
-- Add **unique details** to increase distinctiveness
-- When in doubt, choose the most **concrete, imageable** option
-
-#### Step 6: Add a Distinctive Mark
-
-Choose ONE distinctive mark to make this scene memorable and distinguishable:
-
-**Mark options:**
-- A small star (★)
-- A spiral mark
-- A zigzag scratch
-- A tiny triangle
-- A dotted line
-- A bold underline
-- A circle with dot
-- Parallel lines
-- A checkmark
-- An X mark
-
-**Placement:** On the "key part" of the object (the most important or active component)
-
-**Example:** 
-- Stopwatch → red triangle at 5-minute mark
-- Balance scale → gold star on the heavier side
-- Gate → spiral on the latch mechanism
-
-#### Step 7: Create Scene Text
-
-Compose a one-paragraph description using:
-- Your chosen object/metaphor
-- Your distinctive mark
-- A person interacting (one action only)
-- The key quote from evidence
-- Your paraphrase
-
-**Template:**
-```
-Picture: A person holds [object] with [mark] on [location]. They [action] and say "[key quote]".
-Paraphrase: [Your 1-sentence paraphrase from Step 3]
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Example:**
-```
-Picture: A person holds a stopwatch with a red triangle at the 5-minute position. They point urgently at the mark and say "timeout is 300 seconds".
-Paraphrase: The deployment timeout is set to 300 seconds.
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Keep it:**
-- Concrete (one object, one action, one quote)
-- Simple (avoid multiple entities or complex interactions)
-- Grounded in evidence (quote must be from evidence)
-
-#### Step 8: Validate Scene (Simplified)
-
-Check that your scene doesn't introduce NEW specific claims not in evidence:
-
-**Block (validation fails if present and NOT in evidence):**
-- ❌ New proper names (e.g., "Dr. Smith" if not mentioned by user)
-- ❌ New specific dates (e.g., "March 15th" if not mentioned)
-- ❌ New specific numbers (e.g., "42 patients" if not mentioned)
-- ❌ New places (e.g., "Boston" if not mentioned)
-- ❌ Graph notation (arrows →, brackets [], nodes)
-- ❌ Email addresses, URLs, SSNs not in evidence
-
-**Allow (these are OK even if not explicitly in evidence):**
-- ✅ Metaphorical objects ("balance scale" even if user didn't say it)
-- ✅ Scaffolding words ("Picture:", "They", "Paraphrase:")
-- ✅ Generic descriptions ("a person", "the object", "the mark")
-- ✅ Distinctive marks (stars, spirals, etc.)
-- ✅ Action verbs (points, holds, tests)
-
-**If validation fails:**
-Use minimal fallback:
-```
-Picture: A person pauses over "[concept]" and says "[quote]".
 (Mnemonic depiction only. Not evidence.)
 ```
 
-#### Step 9: Store in Memory
+**Scene quality rules:**
+- The object should be concrete and visually specific (not abstract)
+- The distinctive mark must be unique to THIS scene — avoid generic details
+- The key information must appear explicitly in the scene (as text on a sign,
+  words in a speech bubble, a label on the object)
+- Anchor term from the fact file must appear somewhere in the scene
+- Three sketch steps maximum, written as actions (verbs), not labels (nouns)
+- Choose physical objects: tools, containers, instruments, architectural
+  features — not abstractions
 
-Add to `human` memory block with this format:
+**Scene validation:** Before writing, confirm the scene contains no new specific
+facts — dates, names, numbers, or places — not present in the user's original
+information. Metaphorical objects are permitted. Invented specifics are not.
 
+### Step 4: Commit
+
+Write both files. Use a git commit message that records what was stored,
+evidence score, and information type:
 ```
-[FACT] {fact content} (confidence: {HIGH|MED|LOW}, evidence: {score}, verified: {date})
-
-[SCENE] {scene text with sketch steps}
+mem: store {anchor-term} ({type}, evidence:{score})
 ```
 
-**Example:**
-```
-[FACT] The deployment timeout is set to 300 seconds (confidence: HIGH, evidence: 8.5, verified: 2026-01-06)
+### Streamlined Path (Medium-Confidence Items)
 
-[SCENE] Picture: A person holds a stopwatch with a red triangle at the 5-minute position. They point urgently at the mark and say "timeout is 300 seconds".
-Paraphrase: The deployment timeout is set to 300 seconds.
-Sketch steps: 1) Draw large stopwatch at 5:00, 2) Add red triangle at 5-min mark, 3) Draw person pointing urgently, 4) Add speech bubble "timeout is 300 seconds", 5) Label "deployment timeout"
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
+For items routing to STREAMLINED (evidence score 5-7) where full encoding is
+disproportionate:
+- Write the fact file with full frontmatter
+- Omit the `linked_scene` field entirely — do not set to "none"
+- Skip the scene file
+- These items will retrieve at State C (reduced confidence) per the
+  retrieval protocol
+- A sleep-time consolidation pass may add scenes to these items later
+
+```yaml
+# Streamlined path frontmatter example
+---
+description: Session token three-factor validation — device fingerprint,
+  90-minute duration, IP-change revocation
+type: compositional
+confidence: MEDIUM
+evidence_score: 5
+stored: 2026-02-21
+# linked_scene omitted — streamlined path, no scene file exists
+---
 ```
 
-**One location (`human` block), clear format, no confusion.**
+If the user later confirms or repeats streamlined-path information, re-score
+and consider upgrading to full encoding with a scene file.
+
+## Worked Examples
+
+### Example 1: Discrete Item — Full Encoding Path
+
+**User says:** "The emergency access code for the crisis protocol is CODE-OSCAR7.
+We learned it in the December training session."
+
+**Duplicate check:** Search facts/ — no existing file on this topic. Proceed.
+
+**Evidence Assessment:**
+- Source reliability: Stated by user (2)
+- Specificity: Precise with identifier (3)
+- Repetition: First mention (0)
+- Consistency: No context to check (1)
+- **Total: 6** → Routes to STREAMLINED
+
+**Applying stakes override:** This is a discrete item with a specific identifier
+(access code) where retrieval failure has real-world consequences. Evidence score
+is 5 or above, so default to FULL regardless of standard STREAMLINED routing.
+
+**Step 1 — Classify:** Discrete (single item with clear identifier)
+
+**Step 2 — Generate fact file:** `facts/code-oscar7.md`
+
+```yaml
+---
+description: Emergency access code CODE-OSCAR7 from December crisis protocol
+  training session
+type: discrete
+linked_scene: scenes/code-oscar7.md
+confidence: MEDIUM
+evidence_score: 6
+stored: 2026-02-21
+---
+```
+
+The emergency access code for the crisis protocol is CODE-OSCAR7. This was
+taught during the December training session.
+
+**Step 3 — Generate scene file:** `scenes/code-oscar7.md`
+
+```yaml
+---
+description: Scene cue for CODE-OSCAR7 — emergency crisis protocol, December
+  training
+type: scene
+linked_fact: facts/code-oscar7.md
+confidence: MEDIUM
+stored: 2026-02-21
+---
+```
+
+Picture: A red wall-mounted emergency phone with a gold star beside the dial,
+a hand reaching for the receiver urgently. A speech bubble from the phone
+reads "CODE-OSCAR7."
+
+Sketch steps: (1) Draw a red wall-mounted emergency phone in a hospital
+corridor, (2) Add a gold star emblem beside the rotary dial, (3) Embed
+"CODE-OSCAR7" in a speech bubble rising from the receiver.
+
+(Mnemonic depiction only. Not evidence.)
+
+**Step 4 — Commit:**
+`mem: store code-oscar7 (discrete, evidence:6, full path — stakes override)`
 
 ---
 
-### RETRIEVAL PHASE (When Recalling Information) 🔍
+### Example 2: Compositional Item — Streamlined Encoding Path
 
-**⚠️ THIS IS WHERE THE DRAWING EFFECT PAYS OFF!**
+**User says:** "Session tokens use three-factor validation: the authentication
+mechanism checks the user's device fingerprint, sessions last 90 minutes
+maximum, and tokens are revoked immediately if the user's IP address changes."
 
-The research shows: drawing improves **retrieval/recollection**, not just encoding. You must actively reconstruct scenes when answering questions.
+**Duplicate check:** Search facts/ — no existing file on session tokens. Proceed.
 
-#### When User Asks a Question:
+**Evidence Assessment:**
+- Source reliability: Stated by user (2)
+- Specificity: Specific (2)
+- Repetition: First mention (0)
+- Consistency: No context to check (1)
+- **Total: 5** → Routes to STREAMLINED
 
-**Step 1: Search for Relevant Facts**
-Search `human` memory block for facts matching the query.
+Score is 5 — streamlined path is appropriate. This is a first-mention technical
+definition without confirmation. Not a high-stakes item requiring override.
 
-**Step 2: Reconstruct the Scene (Context Reinstatement)**
-For each relevant fact with a scene, **actively reconstruct** before answering:
+**Step 1 — Classify:** Compositional (multi-part definition with three components)
 
-1. **Quote cue**: What was the original quote?
-2. **Object/metaphor**: What object did you sketch?
-3. **Distinctive mark**: What mark did you add? Where?
-4. **Action**: What was the person doing?
-5. **Your sketch steps**: Recall the steps YOU generated
+**Step 2 — Component listing (compositional verification):**
+This definition has 3 parts:
+1. Authentication mechanism: device fingerprint check
+2. Session duration: 90 minutes maximum
+3. Revocation condition: IP address change triggers immediate revocation
 
-**Example reconstruction:**
-```
-Query: "What was the deployment timeout?"
+All three must appear in the paraphrase.
 
-Mental reconstruction:
-- Quote: "timeout is 300 seconds"
-- Object: Stopwatch showing 5:00
-- Mark: Red triangle at 5-minute position
-- Action: Person pointing urgently
-- My steps: 1) Stopwatch at 5:00, 2) Red triangle, 3) Person pointing, 4) Speech bubble, 5) Label
-```
+**Generate fact file:** `facts/session-token-validation.md`
 
-**Step 3: Use Scene as Retrieval Cue**
-The scene provides **context tags** that support recollection:
-- "I remember drawing a stopwatch with the red triangle..."
-- "The person was pointing urgently at the 5-minute mark..."
-- "The quote was 'timeout is 300 seconds'..."
-
-This "context reinstatement" activates the richer memory trace.
-
-**Step 4: Answer with FACT + Scene Context**
-Combine fact content with scene-based context:
-
-```
-"The deployment timeout is 300 seconds. I remember this from the conversation 
-where we discussed the configuration - I created a sketch with a stopwatch 
-showing 5:00 and a red triangle warning at the 5-minute mark."
-```
-
-**Why this matters:** The drawing effect is about **recollection** (remembering context and source), not just familiarity (recognizing something). Scene reconstruction provides that context.
-
-**Don't skip retrieval reconstruction!** This is where the memory benefit appears.
-
+```yaml
 ---
-
-
-## Brief Example
-
-**User:** "In the training session on Dec 12th, the facilitator said CODE-OSCAR7 is the emergency code."
-
-**Your workflow:**
-1. **Extract**: 2 quotes (15 words), context (training, Dec 12), source (conversation), timestamp
-2. **Score**: 7 points → MEDIUM confidence  
-3. **Paraphrase**: "The facilitator defined CODE-OSCAR7 as the emergency code in the December 12th training."
-4. **Generate sketch** (YOU create): Red emergency phone → gold star by dial → person reaching → speech bubble "CODE-OSCAR7" → label "Crisis Protocol"
-5. **Create scene**: "A person reaches for a red emergency phone with a gold star by the dial and says 'CODE-OSCAR7 is the emergency code.'"
-6. **Validate**: ✓ All details from evidence
-7. **Store**: [FACT] + [SCENE] in memory
-
-**For detailed examples** covering high/medium/low evidence cases and retrieval, see `references/worked-examples.md`.
-
+description: Session token three-factor validation — device fingerprint,
+  90-minute duration, IP-change revocation
+type: compositional
+confidence: MEDIUM
+evidence_score: 5
+stored: 2026-02-21
+# linked_scene omitted — streamlined path, no scene file exists
 ---
+```
+
+Session tokens use three-factor validation. First, the authentication mechanism
+verifies the user's device fingerprint. Second, each session has a maximum
+duration of 90 minutes. Third, tokens are revoked immediately if the user's IP
+address changes during the session.
+
+Checking paraphrase against component list:
+- Device fingerprint check ✓
+- 90-minute maximum ✓
+- IP-change revocation ✓
+
+All three components preserved.
+
+**Step 3 — Commit:**
+`mem: store session-token-validation (compositional, evidence:5, streamlined)`
+
+No scene file generated. This item will retrieve at State C (reduced confidence)
+per the retrieval protocol. If the user confirms or repeats this information,
+re-score and consider upgrading to full encoding with a scene file.
+
 ## Troubleshooting
 
-### Problem: Not sure if evidence is sufficient
+**Scene file and fact file have different base names**
+Bidirectional linking depends on shared filenames. If `facts/code-oscar7.md`
+links to `scenes/emergency-code.md`, the retrieval protocol may fail to find
+the corresponding file. Fix: rename the scene file to match the fact file's
+base name and update both `linked_scene` and `linked_fact` fields.
 
-**Diagnosis:**
-- Can you identify 2+ quotes totaling 15+ words?
-- Is there context about when/where/why?
+**Frontmatter description too vague to surface in search**
+If the agent can't find a file by scanning frontmatter, the description lacks
+specificity. Every description must contain the anchor term — the specific
+identifier that makes it findable. "Emergency code information" is too vague.
+"Emergency access code CODE-OSCAR7 from December training" is findable.
 
-**Solutions:**
-- **If YES**: Store with MED or LOW confidence
-- **If NO but important**: Ask user for more details
-- **If NO and casual**: Wait for more evidence
-- **When in doubt**: Err on side of storing with LOW confidence
+**Compositional paraphrase missing components**
+If retrieval returns an incomplete answer for a multi-part definition, the
+encoding step likely skipped the component listing check. Re-encode: list all
+components explicitly, confirm each appears in the paraphrase, then rewrite
+the fact file.
 
-### Problem: Multiple facts in one message
+**Contradiction discovered at write time**
+If the new information conflicts with an existing fact file, do not overwrite.
+Surface both versions to the user. Once the user confirms which is correct,
+update the fact file and record the correction in the commit message:
+`mem: update {anchor-term} (user-confirmed correction, evidence:{new-score})`
 
-**Example:**
+**Scene contains invented specifics**
+If a scene file includes dates, numbers, names, or places not present in the
+user's original information, the scene validation check was skipped. Rewrite
+the scene using only metaphorical objects and details from the original.
+The footer "(Mnemonic depiction only. Not evidence.)" must be present.
+
+**Streamlined item needs upgrading to full path**
+When a user confirms or repeats information that was previously stored via
+the streamlined path, re-score the evidence. If it now routes to FULL (or
+stakes override applies), generate a scene file with the same base name,
+add the `linked_scene` field to the existing fact file's frontmatter, and
+commit: `mem: upgrade {anchor-term} (added scene, evidence:{new-score})`
+
+## Quick Reference
+
 ```
-User: "The API timeout is 30 seconds and the retry limit is 3 attempts."
+ENCODING DECISION FLOW:
+  User shares information
+        │
+        ▼
+  Check facts/ for duplicates ── duplicate found? ── compare & resolve
+        │
+        ▼ (no duplicate)
+  Evidence Assessment (0-12)
+        │
+   ┌────┼────────────┐
+   ▼    ▼            ▼
+  0-4  5-7          8-12
+  DROP  STREAMLINED  FULL
+  (don't │            │
+  encode)│       ┌────┤
+         ▼       ▼    ▼
+       Classify  Classify
+         │       │
+         ▼       ▼
+       Fact    Fact + Scene
+       file    files
+         │       │
+         ▼       ▼
+       Commit  Commit
+
+  * Stakes override: discrete + identifier + consequences → FULL
+  * Contradiction: pause, surface to user, do not encode silently
 ```
 
-**Solution:** Store each fact separately:
 ```
-[FACT 1] The API timeout is 30 seconds (confidence: MED, evidence: 5, ...)
-[SCENE 1] Clock showing 30 seconds...
+FILE STRUCTURE:
+  memory/
+  ├── system/
+  │   └── retrieval-protocol.md     ← always loaded
+  ├── facts/
+  │   └── {anchor-term}.md          ← paraphrase + frontmatter
+  ├── scenes/
+  │   └── {anchor-term}.md          ← scene + 3 sketch steps + frontmatter
+  └── (index generated by sleep-time agent if needed)
 
-[FACT 2] The retry limit is 3 attempts (confidence: MED, evidence: 5, ...)
-[SCENE 2] Three numbered boxes...
-```
-
-### Problem: Information contradicts existing memory
-
-**Solution:**
-- Store new fact with timestamp
-- Note the contradiction in context
-- Keep both unless user clarifies which is correct
-
-```
-[FACT] The API timeout is now 60 seconds (confidence: HIGH, evidence: 8, verified: 2026-01-06)
-Note: This supersedes previous value of 30 seconds from 2026-01-05.
+  # Drawing-memory files only; other system/ files not shown
 ```
 
-### Problem: Sensitive information (PII, medical, financial)
-
-**Guidelines:**
-- **Only store if** evidence score >= 8 (high confidence required)
-- **Otherwise**: Mark as TENTATIVE or wait for better evidence
-- **Never** include sensitive details in scene metaphors
-
-**Example:**
 ```
-User: "My SSN is 123-45-6789"
+FRONTMATTER TEMPLATE (fact file):
+  ---
+  description: [summary with ANCHOR TERM]
+  type: [discrete | compositional | relational]
+  linked_scene: scenes/{anchor-term}.md    # omit for streamlined
+  confidence: [HIGH | MEDIUM | LOW]
+  evidence_score: [0-12]
+  stored: [YYYY-MM-DD]
+  ---
 
-Action: DON'T STORE (even with quote, this is too sensitive for agent memory)
-Response: "I've noted that you shared that, but I won't store such sensitive information in my memory. You'll need to provide it again when needed."
+FRONTMATTER TEMPLATE (scene file):
+  ---
+  description: Scene cue for [ANCHOR TERM] — [topic]
+  type: scene
+  linked_fact: facts/{anchor-term}.md
+  confidence: [HIGH | MEDIUM | LOW]
+  stored: [YYYY-MM-DD]
+  ---
 ```
 
-### Problem: Spending too long on sketch steps
+```
+SCENE FORMAT:
+  Picture: [concrete object + distinctive mark + embedded key info]
+  Sketch steps: (1) Draw [object], (2) Add [mark] on [location],
+  (3) Embed "[quote]" as [sign/label/speech bubble]
+  (Mnemonic depiction only. Not evidence.)
+```
 
-**Time guidance:**
-- Target: 30-60 seconds per fact
-- If taking longer: simplify (fewer steps, simpler metaphor)
-- Remember: Generation effort is important, but don't overdo it
+```
+COMMIT MESSAGE FORMAT:
+  mem: store {anchor-term} ({type}, evidence:{score})
+  mem: store {anchor-term} ({type}, evidence:{score}, full path — stakes override)
+  mem: store {anchor-term} ({type}, evidence:{score}, streamlined)
+  mem: update {anchor-term} (user-confirmed correction, evidence:{score})
+  mem: upgrade {anchor-term} (added scene, evidence:{score})
+```
 
-### Problem: Running out of metaphor variety
-
-**Solutions:**
-- Review metaphor catalog in Step 5 (50+ options)
-- Combine metaphors (e.g., "gate with hourglass")
-- Add specific details (color, size, orientation)
-- Focus on distinctive marks (vary these too)
-
-### Problem: Forgetting to reconstruct scenes at retrieval
-
-**This is critical! Set a retrieval habit:**
-
-1. User asks question → Search memory
-2. Find relevant fact → **STOP**
-3. **Reconstruct scene** (quote, object, mark, action)
-4. **Then** answer with context
-
-**Reminder:** The drawing effect shows at **retrieval**, not just encoding!
-
----
-
-## Key Principles to Remember
-
-1. **Motor component is critical**: YOU generate sketch steps, don't auto-generate
-2. **Retrieval reconstruction matters**: Use scenes as context cues when answering
-3. **Flexibility over rigidity**: Evidence thresholds are guidelines, use judgment
-4. **Integration is key**: Elaboration + Motor + Pictorial = better memory
-5. **Recollection over familiarity**: Scenes support detailed recall with context
-6. **Distinctiveness prevents interference**: Vary metaphors, add unique marks
-7. **One storage location**: `human` block only, clear format
-8. **Evidence grounds facts**: No evidence = don't store (prevents confabulation)
-
----
-
-## Quick Reference Card
-
-**ENCODING (when storing):**
-1. Extract evidence (quotes, context, source, timestamp)
-2. Score evidence (0-10 scale, flexible thresholds)
-3. Paraphrase (3rd person, neutral, 1 sentence)
-4. **Generate sketch steps** (YOU create 3-5 steps) ⭐
-5. Choose metaphor (vary choices, avoid repetition)
-6. Add distinctive mark (one per scene)
-7. Create scene text (object + mark + action + quote)
-8. Validate (no new specific claims)
-9. Store in `human` block
-
-**RETRIEVAL (when answering):**
-1. Search for relevant facts
-2. **Reconstruct scenes** (quote, object, mark, action) ⭐
-3. Use scene as retrieval cue
-4. Answer with fact + scene context
-
-**Critical success factors:**
-- ✅ YOU generate sketch steps (motor component)
-- ✅ YOU reconstruct scenes at retrieval
-- ✅ Vary metaphors (distinctiveness)
-- ✅ Use flexible thresholds (judgment over rules)
-
----
-
-**Remember: The drawing effect comes from DOING the work (generating, reconstructing), not having it done for you. Be an active memory creator!**
+(Encoding skill only. For retrieval instructions, see
+memory/system/retrieval-protocol.md.)
