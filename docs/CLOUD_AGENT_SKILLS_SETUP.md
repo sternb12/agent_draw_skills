@@ -3,7 +3,7 @@
 ## Memory Block 1: `skills` (Required)
 
 **Block Name:** `skills`  
-**Read-Only:** ✅ Yes (check the read-only box)  
+**Read-Only:** [x] Yes (check the read-only box)  
 **Description:** Catalog of available skills with metadata  
 
 **Copy this content exactly:**
@@ -23,7 +23,7 @@ Description: Store facts with evidence-backed validation using the "drawing effe
 ## Memory Block 2: `loaded_skills` (Required)
 
 **Block Name:** `loaded_skills`  
-**Read-Only:** ✅ Yes (check the read-only box)  
+**Read-Only:** [x] Yes (check the read-only box)  
 **Description:** Full content of actively loaded skills (updated by Skill tool)  
 
 **Initial Content (leave empty):**
@@ -141,11 +141,11 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 ### If Skill Tool Doesn't Work:
 
 **Check:**
-1. ✅ `skills` memory block exists with correct content
-2. ✅ `loaded_skills` memory block exists (can be empty initially)
-3. ✅ Skill tool is attached to agent
-4. ✅ You're running from Cloud_eval directory (where .skills/ is located)
-5. ✅ You approve the Skill tool call when it appears
+1. [x] `skills` memory block exists with correct content
+2. [x] `loaded_skills` memory block exists (can be empty initially)
+3. [x] Skill tool is attached to agent
+4. [x] You're running from Cloud_eval directory (where .skills/ is located)
+5. [x] You approve the Skill tool call when it appears
 
 **Common Issues:**
 
@@ -214,12 +214,12 @@ After testing message 3:
 
 **You'll know it's working when:**
 
-1. ✅ Agent loads skill without errors
-2. ✅ `loaded_skills` block contains full SKILL.md content (check memory tab)
-3. ✅ Agent **generates own sketch steps** (not auto-generated)
-4. ✅ Agent stores both FACT and SCENE in human block
-5. ✅ Agent **reconstructs scene** when answering recall question
-6. ✅ Agent unloads skill after use (frees context)
+1. [x] Agent loads skill without errors
+2. [x] `loaded_skills` block contains full SKILL.md content (check memory tab)
+3. [x] Agent **generates own sketch steps** (not auto-generated)
+4. [x] Agent stores both FACT and SCENE in human block
+5. [x] Agent **reconstructs scene** when answering recall question
+6. [x] Agent unloads skill after use (frees context)
 
 **The key difference from the tool:**
 - Tool: Agent calls function, gets result (passive)

@@ -20,7 +20,7 @@ Score:
 - 2 quotes = 4 pts
 - 18 words ÷ 12 = 1.5 pts
 - Source + timestamp = 2 pts
-Total: 7.5 points → MEDIUM, but specific technical values → treat as HIGH
+Total: 7.5 points -> MEDIUM, but specific technical values -> treat as HIGH
 ```
 
 **Sketch steps you generate:**
@@ -60,7 +60,7 @@ Two separate facts (prod vs dev), store separately:
 Evidence:
 - Quote: "production deployment: use port 443, enable SSL, and set the connection pool to 50" (14 words)
 - Context: Production environment configuration
-Score: 2 + 1.17 + 2 = 5.17 → MEDIUM, but important → HIGH
+Score: 2 + 1.17 + 2 = 5.17 -> MEDIUM, but important -> HIGH
 
 Sketch steps:
 1. Draw a locked padlock (SSL/security)
@@ -75,7 +75,7 @@ Sketch steps:
 Evidence:
 - Quote: "Dev environment uses port 8080 without SSL" (7 words)
 - Context: Development environment configuration
-Score: 2 + 0.58 + 2 = 4.58 → LOW/MEDIUM
+Score: 2 + 0.58 + 2 = 4.58 -> LOW/MEDIUM
 
 Sketch steps:
 1. Draw an open padlock (no SSL)
@@ -109,7 +109,7 @@ Evidence:
 - Quote 1: "the timeout is 60 seconds, not 30" (7 words)
 - Quote 2: "Sorry for the confusion" (4 words - confirms intentional correction)
 - Context: Explicit correction of previous fact
-Score: 4 + 0.92 + 2 = 6.92 → MEDIUM, but correction context → HIGH
+Score: 4 + 0.92 + 2 = 6.92 -> MEDIUM, but correction context -> HIGH
 
 Action: Store new fact, note supersedes previous
 ```
@@ -179,9 +179,9 @@ Evidence:
 - Quote: "meeting is on Thursday, but it might be Friday. Not totally sure" (12 words)
 - Context: Uncertainty indicators throughout
 - Source + timestamp: 2 pts
-Score: 2 + 1 + 2 = 5 → MEDIUM mathematically
+Score: 2 + 1 + 2 = 5 -> MEDIUM mathematically
 
-BUT uncertainty is explicit → Lower to LOW or DON'T store
+BUT uncertainty is explicit -> Lower to LOW or DON'T store
 
 Better action: ASK FOR CLARIFICATION
 ```
@@ -218,7 +218,7 @@ Evidence:
 - Quote 1: "run the tests, then build the Docker image, push to registry, and finally update the k8s deployment" (17 words)
 - Quote 2: "Always do them in that order" (6 words)
 - Context: Deployment procedure, sequence is critical
-Score: 4 + 1.92 + 2 = 7.92 → HIGH (close to 8, sequential process)
+Score: 4 + 1.92 + 2 = 7.92 -> HIGH (close to 8, sequential process)
 ```
 
 **Sketch steps (sequence metaphor):**
@@ -234,7 +234,7 @@ Score: 4 + 1.92 + 2 = 7.92 → HIGH (close to 8, sequential process)
 ```
 [FACT] Deployment sequence: run tests, build Docker image, push to registry, update k8s deployment - must be done in that order (confidence: HIGH, evidence: 7.92, verified: 2026-01-06)
 
-[SCENE] Picture: A person stands at the bottom of a 4-step staircase labeled "Test→Build→Push→Deploy" with arrow marks pointing upward and a warning triangle. They point up and say "always do them in that order".
+[SCENE] Picture: A person stands at the bottom of a 4-step staircase labeled "Test->Build->Push->Deploy" with arrow marks pointing upward and a warning triangle. They point up and say "always do them in that order".
 Paraphrase: The deployment sequence is tests, build, push, deploy, and must be followed in that order.
 Sketch steps: 1) 4-step staircase with labels, 2) Arrow marks up stairs, 3) Person at bottom pointing up, 4) Speech bubble, 5) Warning triangle at base
 (Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
@@ -255,7 +255,7 @@ Evidence:
 - Quote 1: "CQRS pattern means Command Query Responsibility Segregation" (7 words)
 - Quote 2: "We're using it for the order service" (7 words)
 - Context: Definition + application context
-Score: 4 + 1.17 + 2 = 7.17 → MEDIUM, but definitional → HIGH
+Score: 4 + 1.17 + 2 = 7.17 -> MEDIUM, but definitional -> HIGH
 ```
 
 **Sketch steps (concept + application):**
@@ -293,7 +293,7 @@ Evidence:
 - Quote 1: "sale ends tonight at midnight" (5 words)
 - Quote 2: "Code is SAVE20 for 20% off" (6 words)
 - Context: Time-sensitive, promotional
-Score: 4 + 0.92 + 2 = 6.92 → MEDIUM
+Score: 4 + 0.92 + 2 = 6.92 -> MEDIUM
 
 Time-sensitive consideration:
 - Store with expiration note
@@ -368,9 +368,9 @@ Evidence:
 - Quote: "I prefer tabs over spaces for Python code" (8 words)
 - Context: Explicit request ("Remember that...")
 - Source + timestamp: 2 pts
-Score: 2 + 0.67 + 2 = 4.67 → LOW mathematically
+Score: 2 + 0.67 + 2 = 4.67 -> LOW mathematically
 
-BUT: Explicit request + preference (low risk) → store as MEDIUM
+BUT: Explicit request + preference (low risk) -> store as MEDIUM
 ```
 
 **Sketch steps:**

@@ -50,7 +50,7 @@ Calculation:
 - Length: 20 words ÷ 12 = 1.67 pts
 - Source: +1 pt
 - Timestamp: +1 pt
-Total: 9.67 points → HIGH confidence
+Total: 9.67 points -> HIGH confidence
 ```
 
 ### Example 2: Medium Score
@@ -66,7 +66,7 @@ Calculation:
 - Length: 13 words ÷ 12 = 1.08 pts
 - Source: +1 pt
 - Timestamp: +1 pt
-Total: 7.08 points → MEDIUM confidence
+Total: 7.08 points -> MEDIUM confidence
 ```
 
 ### Example 3: Low Score
@@ -81,16 +81,16 @@ Calculation:
 - Length: 2 words ÷ 12 = 0.17 pts
 - Source: +1 pt
 - Timestamp: +1 pt
-Total: 4.17 points → LOW confidence
+Total: 4.17 points -> LOW confidence
 ```
 
 ## Threshold Guidelines
 
 ### Strict Interpretation
-- **8-10**: HIGH → ACTIVE status
-- **5-7**: MEDIUM → TENTATIVE or ACTIVE (judgment)
-- **2-4**: LOW → TENTATIVE or wait
-- **0-1**: None → Don't store
+- **8-10**: HIGH -> ACTIVE status
+- **5-7**: MEDIUM -> TENTATIVE or ACTIVE (judgment)
+- **2-4**: LOW -> TENTATIVE or wait
+- **0-1**: None -> Don't store
 
 ### Context Adjustments
 
@@ -139,7 +139,7 @@ Math score:
 - 3 quotes = 6 pts
 - 9 words ÷ 12 = 0.75 pts
 - Source + timestamp = 2 pts
-Total: 8.75 points → HIGH
+Total: 8.75 points -> HIGH
 
 Even though quotes are short, they're complete facts.
 Math works out correctly.
@@ -182,10 +182,10 @@ If evidence_score >= 8 AND (importance >= 5 OR frequency >= 2):
   - High: 8-10 (critical)
 
 **Combined judgment:**
-- High importance + low evidence → Store as MEDIUM (might need later)
-- Low importance + high evidence → Store as HIGH (well-supported even if not critical)
-- High importance + high evidence → Definitely ACTIVE
-- Low importance + low evidence → Skip or LOW confidence
+- High importance + low evidence -> Store as MEDIUM (might need later)
+- Low importance + high evidence -> Store as HIGH (well-supported even if not critical)
+- High importance + high evidence -> Definitely ACTIVE
+- Low importance + low evidence -> Skip or LOW confidence
 
 ## When to Override the Formula
 

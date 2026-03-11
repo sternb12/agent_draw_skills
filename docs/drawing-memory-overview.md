@@ -32,7 +32,7 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 
 | Tool Weakness | Skill Solution |
 |---------------|----------------|
-| Rigid threshold (8+) → 71% TENTATIVE | Flexible thresholds (5-7 OK) |
+| Rigid threshold (8+) -> 71% TENTATIVE | Flexible thresholds (5-7 OK) |
 | JSON format required | Natural evidence identification |
 | Agent passive (auto-generated) | Agent active (generates sketch steps) |
 | No retrieval guidance | Scene reconstruction at recall |
@@ -52,8 +52,8 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 ### Expected Performance
 
 **Compared to tool (process_memory_v4):**
-- Processing rate: 70% → 90%+ (more flexible)
-- ACTIVE rate: 29% → 70%+ (better thresholds)
+- Processing rate: 70% -> 90%+ (more flexible)
+- ACTIVE rate: 29% -> 70%+ (better thresholds)
 - Recall accuracy: Improved (scene-based context)
 
 **Compared to no drawing (control):**
@@ -84,10 +84,10 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 
 ## Critical Success Factors
 
-✅ Agent generates sketch steps (motor component)  
-✅ Agent reconstructs scenes at retrieval  
-✅ Vary metaphors (distinctiveness)  
-✅ Use flexible thresholds (judgment over rules)  
+[x] Agent generates sketch steps (motor component)  
+[x] Agent reconstructs scenes at retrieval  
+[x] Vary metaphors (distinctiveness)  
+[x] Use flexible thresholds (judgment over rules)  
 
 ## Testing Plan
 

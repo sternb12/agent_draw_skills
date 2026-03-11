@@ -27,7 +27,7 @@
                                                                    │
                                                                    │ Agent sees
                                                                    │ catalog
-                                                                   ▼
+                                                                   v
                                                             [Agent has metadata
                                                              for all skills,
                                                              but NOT full content]
@@ -45,13 +45,13 @@
 User: "Remember that CODE-ALPHA7 is the emergency code"
   │
   │
-  ▼
+  v
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ AGENT (Cloud or Local)                                                   │
 │                                                                          │
 │ 1. Checks `skills` memory block:                                        │
-│    ✓ "drawing-memory" available                                         │
-│    ✓ Description matches task (storing information)                     │
+│    [x] "drawing-memory" available                                         │
+│    [x] Description matches task (storing information)                     │
 │                                                                          │
 │ 2. Decision: "I should use the drawing-memory skill"                    │
 │                                                                          │
@@ -61,7 +61,7 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
   │
   │ Tool call sent to client
   │
-  ▼
+  v
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ LETTA CLIENT (Client-Side Execution)                                    │
 │                                                                          │
@@ -94,7 +94,7 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
   │
   │ Skill now loaded in agent's context
   │
-  ▼
+  v
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ AGENT (Now Has Full Skill Instructions)                                 │
 │                                                                          │
@@ -140,7 +140,7 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────┐
-│ skills (read-only)             │  ← Populated at startup by client
+│ skills (read-only)             │  <- Populated at startup by client
 │ Size: ~500 words               │
 │ Always in context              │  Purpose: Catalog of available skills
 ├────────────────────────────────┤
@@ -149,7 +149,7 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
 │                                │
 │ Available Skills:              │
 │                                │
-│ ### drawing-memory             │  ← Agent sees this and knows
+│ ### drawing-memory             │  <- Agent sees this and knows
 │ ID: drawing-memory             │    when to load the skill
 │ Description: Store facts...    │
 │                                │
@@ -161,12 +161,12 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
             ↓ When agent calls Skill(load)
             
 ┌────────────────────────────────┐
-│ loaded_skills (read-only)      │  ← Updated by Skill tool (client-side)
+│ loaded_skills (read-only)      │  <- Updated by Skill tool (client-side)
 │ Size: Variable (grows)         │
 │ Only loaded skills in context  │  Purpose: Full instructions for active skills
 ├────────────────────────────────┤
 │                                │
-│ [Currently empty]              │  ← Before loading
+│ [Currently empty]              │  <- Before loading
 │                                │
 └────────────────────────────────┘
 
@@ -177,14 +177,14 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
 │ Size: ~26KB (777 lines)        │
 │ In context WHILE skill active  │
 ├────────────────────────────────┤
-│ # Drawing Memory Skill         │  ← Complete SKILL.md content
+│ # Drawing Memory Skill         │  <- Complete SKILL.md content
 │                                │
-│ ## Research Foundation         │  ← Agent can now read and
+│ ## Research Foundation         │  <- Agent can now read and
 │ ...                            │    follow all instructions
 │ ## Step 1: Extract Evidence    │
 │ ## Step 2: Score Evidence      │
 │ ## Step 3: Paraphrase          │
-│ ## Step 4: Generate Sketch     │  ← MOTOR COMPONENT
+│ ## Step 4: Generate Sketch     │  <- MOTOR COMPONENT
 │ ...                            │
 │ [Complete 777-line workflow]   │
 └────────────────────────────────┘
@@ -195,7 +195,7 @@ User: "Remember that CODE-ALPHA7 is the emergency code"
 │ loaded_skills (read-only)      │
 │ Size: 0                        │
 ├────────────────────────────────┤
-│ [Currently empty]              │  ← Content removed, context freed
+│ [Currently empty]              │  <- Content removed, context freed
 └────────────────────────────────┘
 ```
 
@@ -217,8 +217,8 @@ BEFORE skill is needed:
 │ Memory Blocks:                                     │
 │   - human               10K tokens                 │
 │   - persona              2K tokens                 │
-│   - skills               1K tokens  ← Metadata only│
-│   - loaded_skills        0K tokens  ← Empty!       │
+│   - skills               1K tokens  <- Metadata only│
+│   - loaded_skills        0K tokens  <- Empty!       │
 ├────────────────────────────────────────────────────┤
 │ Available: 132K tokens                             │
 └────────────────────────────────────────────────────┘
@@ -232,8 +232,8 @@ AFTER loading drawing-memory skill:
 │ Memory Blocks:                                     │
 │   - human               10K tokens                 │
 │   - persona              2K tokens                 │
-│   - skills               1K tokens  ← Still just   │
-│   - loaded_skills       13K tokens  ← Full content │
+│   - skills               1K tokens  <- Still just   │
+│   - loaded_skills       13K tokens  <- Full content │
 ├────────────────────────────────────────────────────┤
 │ Available: 119K tokens                             │
 └────────────────────────────────────────────────────┘
@@ -251,7 +251,7 @@ AFTER unloading skill:
 │   - human               10K tokens                 │
 │   - persona              2K tokens                 │
 │   - skills               1K tokens                 │
-│   - loaded_skills        0K tokens  ← Freed!       │
+│   - loaded_skills        0K tokens  <- Freed!       │
 ├────────────────────────────────────────────────────┤
 │ Available: 132K tokens                             │
 └────────────────────────────────────────────────────┘
@@ -270,15 +270,15 @@ Space recovered: 13K tokens available for other uses
 
 Agent: I need to store a fact
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
-│ Tool Schema (always in context)           │  ← ~1K tokens always loaded
+│ Tool Schema (always in context)           │  <- ~1K tokens always loaded
 │                                            │
 │ process_memory_v4(                         │
 │   fact_content: str,                       │
-│   evidence_json: str,  ← Rigid format      │
+│   evidence_json: str,  <- Rigid format      │
 │   context: str,                            │
-│   frequency: int,      ← 8 parameters      │
+│   frequency: int,      <- 8 parameters      │
 │   importance_base: int,                    │
 │   risk_if_wrong: int,                      │
 │   depiction_hint: str,                     │
@@ -288,26 +288,26 @@ Agent: I need to store a fact
   │
   │ Agent must format JSON correctly
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
 │ Server-Side Execution                      │
 │                                            │
 │ Python code runs (553 lines)              │
 │ - Deterministic logic                      │
-│ - Auto-generates sketch steps  ← PASSIVE  │
+│ - Auto-generates sketch steps  <- PASSIVE  │
 │ - Returns JSON result                      │
 └────────────────────────────────────────────┘
   │
-  ▼
+  v
 Agent receives result, must parse JSON
 
 Problems:
-❌ Always in context (even when not needed)
-❌ Rigid schema (8 required parameters)
-❌ JSON formatting burden
-❌ Agent is passive (no motor component)
-❌ No retrieval guidance
-❌ Hard to iterate (need to redeploy)
+[ ] Always in context (even when not needed)
+[ ] Rigid schema (8 required parameters)
+[ ] JSON formatting burden
+[ ] Agent is passive (no motor component)
+[ ] No retrieval guidance
+[ ] Hard to iterate (need to redeploy)
 
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -316,9 +316,9 @@ Problems:
 
 Agent: I need to store a fact
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
-│ Skill Catalog (always in context)         │  ← ~200 words (~1K tokens)
+│ Skill Catalog (always in context)         │  <- ~200 words (~1K tokens)
 │                                            │
 │ drawing-memory: Store facts with          │
 │ evidence using drawing effect...          │
@@ -326,7 +326,7 @@ Agent: I need to store a fact
   │
   │ Agent decides to load skill
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
 │ Skill(command="load",                      │
 │       skills=["drawing-memory"])           │
@@ -334,14 +334,14 @@ Agent: I need to store a fact
   │
   │ Client loads full content
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
 │ loaded_skills block (13K tokens)          │
 │                                            │
 │ Complete natural language instructions:   │
 │ • Extract evidence naturally              │
 │ • Score flexibly (5-7 OK)                 │
-│ • Generate your own sketch steps  ← ACTIVE│
+│ • Generate your own sketch steps  <- ACTIVE│
 │ • Create scene text                       │
 │ • Store in memory                         │
 │ • Reconstruct at retrieval                │
@@ -355,22 +355,22 @@ Agent: I need to store a fact
   │ Agent GENERATES sketch steps
   │ Agent stores directly in memory
   │
-  ▼
+  v
 ┌────────────────────────────────────────────┐
 │ Skill(command="unload",                    │
 │       skills=["drawing-memory"])           │
 └────────────────────────────────────────────┘
   │
-  ▼
+  v
 Context freed (13K tokens back)
 
 Benefits:
-✅ Only in context when needed (progressive disclosure)
-✅ Natural language (no rigid schema)
-✅ No JSON formatting
-✅ Agent is ACTIVE (generates sketch steps)
-✅ Includes retrieval guidance
-✅ Easy to iterate (just edit SKILL.md)
+[x] Only in context when needed (progressive disclosure)
+[x] Natural language (no rigid schema)
+[x] No JSON formatting
+[x] Agent is ACTIVE (generates sketch steps)
+[x] Includes retrieval guidance
+[x] Easy to iterate (just edit SKILL.md)
 ```
 
 ---
@@ -390,8 +390,8 @@ SERVER-SIDE (Letta Cloud / API):
 │ • Tool schemas and descriptions            │
 │ • Memory block storage                     │
 └────────────────────────────────────────────┘
-        ▲                    │
-        │                    ▼
+        ^                    │
+        │                    v
       API calls        Responses
         │                    │
         └────────────────────┘
@@ -407,9 +407,9 @@ SERVER-SIDE (Letta Cloud / API):
 │ • loaded_skills block updates             │
 │ • Approval flow handling                  │
 └────────────────────────────────────────────┘
-        ▲
+        ^
         │ Direct filesystem access
-        ▼
+        v
 ┌────────────────────────────────────────────┐
 │ .skills/drawing-memory/                    │
 │   ├── SKILL.md                             │
@@ -424,7 +424,7 @@ SERVER-SIDE (Letta Cloud / API):
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ COMPLETE WORKFLOW: User Message → Skill Execution → Memory Storage          │
+│ COMPLETE WORKFLOW: User Message -> Skill Execution -> Memory Storage          │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 1. STARTUP
@@ -485,7 +485,7 @@ SERVER-SIDE (Letta Cloud / API):
    │   └─ Scene: "Red emergency phone with gold star..."
    │
    ├─ Step 8: Validate (no new claims)
-   │   └─ ✓ CODE-ALPHA7 is in evidence
+   │   └─ [x] CODE-ALPHA7 is in evidence
    │
    └─ Step 9: Store in human memory block
        └─ [FACT] CODE-ALPHA7... (confidence: MED)

@@ -7,7 +7,7 @@ questions were answered correctly by the C6-draw agent (dual-trace). Each
 illustrates a different mechanism by which scene files contribute to retrieval.
 
 The passage content shown is reconstructed from the agent's responses and
-retrieval behavior — the agent's answers drew directly on the stored content,
+retrieval behavior -- the agent's answers drew directly on the stored content,
 making reconstruction reliable. Test questions are verbatim from LME-S.
 
 ---
@@ -44,7 +44,7 @@ The user is 32 years old, born in 1991.
 ```yaml
 ---
 description: User works in marketing department, team of 8, coworker ages
-  noted across sessions — 24, 26, 27, 28, 29, 31, 33, 35 (average 29.5)
+  noted across sessions -- 24, 26, 27, 28, 29, 31, 33, 35 (average 29.5)
 type: compositional
 linked_scene: scenes/work-department-team.md
 confidence: HIGH
@@ -58,7 +58,7 @@ oldest on the team.
 
 **scenes/work-department-team.md**
 ```
-Picture: A 32-year-old professional at a desk at a crossroads — on one
+Picture: A 32-year-old professional at a desk at a crossroads -- on one
 side, a Coursera browser tab open to "Data Analysis," a sticky note reading
 "ask Marcus about his cert program." Coworker snapshots are scattered around:
 the youngest is 24, fresh from college. The user is visibly the senior
@@ -79,18 +79,18 @@ Sketch steps: (1) Draw a desk at a crossroads with two browser tabs open,
 > **2.5 years older** than the average employee in your department."
 
 ### Why the Scene Contributed
-Coworker ages entered archival memory through a dozen separate sessions — each
+Coworker ages entered archival memory through a dozen separate sessions -- each
 mentioning one or two coworkers in passing. As individual fact entries, they're
 hard to aggregate: the agent would need to recognize that scattered entries about
 Marcus (31), Sofia (24), and the others all belong to the same "department team"
 thread. The scene for `work-department-team` served as a **contextual binding
-cue** — the image of the corkboard with names and ages, the young team context,
-the user's awareness of being the senior presence — pulled these scattered
+cue** -- the image of the corkboard with names and ages, the young team context,
+the user's awareness of being the senior presence -- pulled these scattered
 entries into a recognizable pattern at retrieval. Without the scene, the agent
 might retrieve one or two coworker ages but miss the full picture.
 
 **PT Tutor equivalent:** "How many times has this student struggled with shoulder
-anatomy across all sessions?" — requires recognizing that scattered error-pattern
+anatomy across all sessions?" -- requires recognizing that scattered error-pattern
 entries across a semester all belong to the same conceptual thread.
 
 ---
@@ -105,7 +105,7 @@ entries across a semester all belong to the same conceptual thread.
 > Question: How often do I see my therapist, Dr. Smith?"
 
 ### Ground Truth Answer
-Every week (weekly — the most recent state)
+Every week (weekly -- the most recent state)
 
 ### What Was Stored
 
@@ -143,7 +143,7 @@ with feeling overwhelmed by work deadlines and social commitments.
 ```
 Picture: A therapy office, late afternoon light, November. The user seated
 across from Dr. Smith, visibly tired. A planner open on the coffee table
-shows a packed week — three evening social commitments, two late work
+shows a packed week -- three evening social commitments, two late work
 deadlines circled in red. Dr. Smith leans forward: "You mentioned last time
 you'd try saying no to one request this week. How did that go?" The weekly
 cadence feels necessary now, not optional.
@@ -171,12 +171,12 @@ packed planner on the table, (2) Add red circles around two work deadlines,
 > every two weeks to weekly at some point between April and November 2023."
 
 ### Why the Scene Contributed
-Two conflicting fact entries exist in memory — both accurate, but from different
+Two conflicting fact entries exist in memory -- both accurate, but from different
 points in time. A fact-only agent has to rely on timestamps alone to resolve the
 conflict. The scene for the November session carries **emotional and contextual
 weight** that the April scene doesn't: the packed planner, the visible
 exhaustion, the sense that weekly feels necessary rather than scheduled. This
-signal — not just the date, but the gravity of the change — helps the agent
+signal -- not just the date, but the gravity of the change -- helps the agent
 correctly identify the November entry as the current, more serious state and
 present the full picture of *how* the change happened, not just *what* changed.
 
@@ -192,7 +192,7 @@ scene anchors WHEN and WHY the change happened, not just WHAT changed.
 ---
 
 ## Example 3: Temporal Reasoning (Sequencing Events)
-**Why it matters:** +33.3pp gain — the largest relative gain in the evaluation
+**Why it matters:** +33.3pp gain -- the largest relative gain in the evaluation
 
 ### Test Question (verbatim)
 > "Search your memory of past conversation sessions, then answer this question
@@ -209,7 +209,7 @@ Japanese Zero fighter plane model
 **facts/hobby-scale-modeling.md**
 ```yaml
 ---
-description: User builds scale models as hobby — currently Ferrari 288 GTO
+description: User builds scale models as hobby -- currently Ferrari 288 GTO
   (started ~May 7 2023) and 1/48 scale Japanese Zero WWII fighter (started
   ~late April 2023). Zero started first.
 type: compositional
@@ -227,10 +227,10 @@ started.
 **scenes/hobby-scale-modeling.md**
 ```
 Picture: A rainy Sunday, May 7, 2023. Dining room table cleared and covered
-with newspaper. The Ferrari 288 GTO box is open — sprue frames laid out,
+with newspaper. The Ferrari 288 GTO box is open -- sprue frames laid out,
 instruction booklet propped against a coffee mug. The user spends about 5
 hours assembling the basic chassis and engine block. The Japanese Zero kit
-is already on a shelf nearby, partially assembled from a few weeks before —
+is already on a shelf nearby, partially assembled from a few weeks before --
 the fuselage halves joined, decals soaking in a bowl of water.
 
 Sketch steps: (1) Draw a cleared dining table on a rainy Sunday with a
@@ -252,11 +252,11 @@ beside the Zero.
 > The **1/48 scale Japanese Zero** fighter plane was started later, around
 > **late April 2023**...
 >
-> Wait — that would actually make the **Japanese Zero the first**, as late
+> Wait -- that would actually make the **Japanese Zero the first**, as late
 > April 2023 precedes May 7, 2023. So to be precise:
 >
-> - **Japanese Zero (1/48 scale)**: started ~late April 2023 ✅ — **first**
-> - **Ferrari 288 GTO**: started ~May 7, 2023 — second
+> - **Japanese Zero (1/48 scale)**: started ~late April 2023 [x] -- **first**
+> - **Ferrari 288 GTO**: started ~May 7, 2023 -- second
 >
 > You started the **Japanese Zero fighter plane first**, roughly a week or
 > two before you began the Ferrari model."
@@ -265,7 +265,7 @@ beside the Zero.
 This example shows the scene doing something a fact file alone cannot: providing
 a **concrete temporal anchor that enabled real-time self-correction**.
 
-The agent initially stated the Ferrari was first — a plausible retrieval error,
+The agent initially stated the Ferrari was first -- a plausible retrieval error,
 since the Ferrari passage was encountered first in search order. But the scene
 for the Ferrari session contained a specific, vivid detail: "a rainy Sunday,
 May 7, 2023, dining room table, 5 hours on the chassis." This was specific enough
@@ -274,18 +274,18 @@ Japanese Zero's "late April" date, it caught the contradiction and corrected
 itself: late April precedes May 7.
 
 The Zero's partially assembled fuselage already on the shelf in the Ferrari scene
-is the binding cue — it shows the Zero as background context during the Ferrari
+is the binding cue -- it shows the Zero as background context during the Ferrari
 session, visually confirming the Zero came first without requiring explicit
 date arithmetic.
 
 Without the scene, the agent had two fact entries with approximate dates.
-Approximate dates are easy to misorder. The scene's concrete specificity —
-the rainy Sunday, the 5 hours, the Zero already on the shelf — is what made
+Approximate dates are easy to misorder. The scene's concrete specificity --
+the rainy Sunday, the 5 hours, the Zero already on the shelf -- is what made
 the date stick and enabled the correction.
 
 **PT Tutor equivalent:** "Did the student understand rotator cuff anatomy before
-or after the cadaver lab?" The vivid contextual anchor of the scene — what the
-student was doing, what they were touching, where they were standing — is what
+or after the cadaver lab?" The vivid contextual anchor of the scene -- what the
+student was doing, what they were touching, where they were standing -- is what
 allows the agent to correctly sequence learning events over a semester.
 
 ---
@@ -300,5 +300,5 @@ allows the agent to correctly sequence learning events over a semester.
 
 The single-session null result (0pp gain) completes the picture: when one
 passage suffices, scenes add nothing. The effect is specific to exactly the
-questions where episodic context matters — aggregation, change tracking, and
+questions where episodic context matters -- aggregation, change tracking, and
 temporal sequencing.

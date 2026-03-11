@@ -114,14 +114,14 @@ This active participation is what makes the drawing effect work!
 User: "Remember that CODE-ALPHA7 is the emergency code from training"
 
 Agent:
-  → Loads drawing-memory skill
-  → Extracts evidence from conversation
-  → Scores evidence (0-10 scale)
-  → Paraphrases to 3rd person
-  → Generates own sketch steps (motor component)
-  → Creates scene with metaphor + distinctive mark
-  → Stores [FACT] + [SCENE] in memory
-  → Unloads skill
+  -> Loads drawing-memory skill
+  -> Extracts evidence from conversation
+  -> Scores evidence (0-10 scale)
+  -> Paraphrases to 3rd person
+  -> Generates own sketch steps (motor component)
+  -> Creates scene with metaphor + distinctive mark
+  -> Stores [FACT] + [SCENE] in memory
+  -> Unloads skill
 ```
 
 **2. Retrieve Information**
@@ -129,9 +129,9 @@ Agent:
 User: "What was that emergency code?"
 
 Agent:
-  → Searches memory for FACT + SCENE
-  → Reconstructs scene mentally (retrieval component)
-  → Answers with context-rich response
+  -> Searches memory for FACT + SCENE
+  -> Reconstructs scene mentally (retrieval component)
+  -> Answers with context-rich response
   
 Response: "The emergency code is CODE-ALPHA7. I remember creating
 a sketch of a red emergency phone with a gold star marking it..."
@@ -141,23 +141,23 @@ a sketch of a red emergency phone with a gold star marking it..."
 
 **Motor Component**: Agent generates its own sketch steps
 ```
-✅ GOOD (Agent generates):
+[x] GOOD (Agent generates):
    1) Draw red emergency phone on wall
    2) Add gold star by dial
    3) Person reaching urgently
    4) Speech bubble: "CODE-ALPHA7"
    5) Label "Emergency Code"
 
-❌ BAD (Auto-generated):
+[ ] BAD (Auto-generated):
    Agent doesn't do the generative work - no motor component
 ```
 
 **Retrieval Component**: Agent reconstructs scene before answering
 ```
-✅ GOOD:
+[x] GOOD:
    "I remember the red phone with gold star... CODE-ALPHA7"
    
-❌ BAD:
+[ ] BAD:
    "CODE-ALPHA7" (no scene reconstruction)
 ```
 
@@ -212,10 +212,10 @@ This implementation is based on:
 ### Agent Skills Standard Compliance
 
 This skill follows the [Agent Skills open standard](https://agentskills.io/):
-- ✅ YAML frontmatter (name, description)
-- ✅ Progressive disclosure (metadata → instructions → resources)
-- ✅ Cross-platform compatible (Letta, Claude, Cursor, VS Code, etc.)
-- ✅ Bundled resources (examples, references)
+- [x] YAML frontmatter (name, description)
+- [x] Progressive disclosure (metadata -> instructions -> resources)
+- [x] Cross-platform compatible (Letta, Claude, Cursor, VS Code, etc.)
+- [x] Bundled resources (examples, references)
 
 ### Memory Blocks Required
 
@@ -240,9 +240,9 @@ The skill uses a 5-dimension evidence scoring system (0-12 points):
 5. **Stability** (0-2): Temporal persistence
 
 **Routing**:
-- **8-12 points** → ACTIVE (high confidence, store immediately)
-- **5-7 points** → ACTIVE (medium confidence, acceptable)
-- **0-4 points** → TENTATIVE or DROP (insufficient evidence)
+- **8-12 points** -> ACTIVE (high confidence, store immediately)
+- **5-7 points** -> ACTIVE (medium confidence, acceptable)
+- **0-4 points** -> TENTATIVE or DROP (insufficient evidence)
 
 ## Comparison: Skill vs Tool
 
@@ -251,7 +251,7 @@ The skill uses a 5-dimension evidence scoring system (0-12 points):
 | **Context** | Always loaded | Load only when needed |
 | **Format** | Rigid JSON schema | Flexible natural language |
 | **Agent Role** | PASSIVE (calls function) | ACTIVE (generates content) |
-| **Thresholds** | Rigid (score ≥ 8) | Flexible (5-7 acceptable) |
+| **Thresholds** | Rigid (score >= 8) | Flexible (5-7 acceptable) |
 | **Motor Component** | Auto-generated | Agent generates |
 | **Retrieval** | No guidance | Scene reconstruction |
 | **Examples** | None | 14 worked examples |
@@ -268,16 +268,16 @@ identical coverage and format). C7 isolates the scene contribution.
 | Metric | C7 (fact-only) | C6 (dual-trace) | Scene contribution |
 |---|---|---|---|
 | Overall | 54% | **73.7%** | **+19.7pp** |
-| Single-session | 79% | 79% | 0pp (null — expected) |
+| Single-session | 79% | 79% | 0pp (null -- expected) |
 | Multi-session | 43% | **65.5%** | +22.2pp |
 | Knowledge-update | 59% | **81.8%** | +22.7pp |
 | Temporal-reasoning | 38% | **70.8%** | **+33.3pp** |
 
 The single-session null result is mechanistically meaningful: scenes contribute
-specifically when memory must be aggregated, sequenced, or resolved — not when
+specifically when memory must be aggregated, sequenced, or resolved -- not when
 a single lookup suffices. This matches episodic encoding theory exactly.
 
-Full performance ladder (LME-S benchmark, SOTA = 84–86%):
+Full performance ladder (LME-S benchmark, SOTA = 84-86%):
 
 | Condition | Overall | Description |
 |---|---|---|
@@ -285,7 +285,7 @@ Full performance ladder (LME-S benchmark, SOTA = 84–86%):
 | Basic archival | 48% | Selective storage, older format |
 | Fact-only (C7) | 54% | High coverage + clean format |
 | **Dual-trace (C6)** | **73.7%** | **C7 + scene files** |
-| SOTA | 84–86% | BM25 + dense + reranking |
+| SOTA | 84-86% | BM25 + dense + reranking |
 
 See `skills/drawing-memory/references/worked-examples.md` for three annotated
 real-world examples from the evaluation showing each mechanism in action.
@@ -310,7 +310,7 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Status**: ✅ Empirically validated (LME-S controlled evaluation, March 2026)
+**Status**: [x] Empirically validated (LME-S controlled evaluation, March 2026)
 
 **Version**: 2.0.0
 
