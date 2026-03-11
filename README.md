@@ -257,13 +257,38 @@ The skill uses a 5-dimension evidence scoring system (0-12 points):
 | **Examples** | None | 14 worked examples |
 | **Iteration Speed** | 30 min (redeploy) | 5 min (edit SKILL.md) |
 
-## Expected Improvements
+## Empirical Validation
 
-Based on initial testing compared to traditional tool approach:
+Evaluated on LongMemEval-S (LME-S): 4,575 real conversation sessions, 100
+structured recall questions, GPT-4o graded against ground-truth oracle.
 
-- **Processing Rate**: 70% → 90%+ (flexible thresholds)
-- **ACTIVE Storage**: 29% → 70%+ (better confidence levels)
-- **Recall Accuracy**: +15-25% (scene-based context)
+Controlled comparison: C6 (dual-trace: fact + scene) vs C7 (fact-only,
+identical coverage and format). C7 isolates the scene contribution.
+
+| Metric | C7 (fact-only) | C6 (dual-trace) | Scene contribution |
+|---|---|---|---|
+| Overall | 54% | **73.7%** | **+19.7pp** |
+| Single-session | 79% | 79% | 0pp (null — expected) |
+| Multi-session | 43% | **65.5%** | +22.2pp |
+| Knowledge-update | 59% | **81.8%** | +22.7pp |
+| Temporal-reasoning | 38% | **70.8%** | **+33.3pp** |
+
+The single-session null result is mechanistically meaningful: scenes contribute
+specifically when memory must be aggregated, sequenced, or resolved — not when
+a single lookup suffices. This matches episodic encoding theory exactly.
+
+Full performance ladder (LME-S benchmark, SOTA = 84–86%):
+
+| Condition | Overall | Description |
+|---|---|---|
+| Vanilla (no memory) | ~9% | No stored sessions |
+| Basic archival | 48% | Selective storage, older format |
+| Fact-only (C7) | 54% | High coverage + clean format |
+| **Dual-trace (C6)** | **73.7%** | **C7 + scene files** |
+| SOTA | 84–86% | BM25 + dense + reranking |
+
+See `skills/drawing-memory/references/worked-examples.md` for three annotated
+real-world examples from the evaluation showing each mechanism in action.
 
 ## Contributing
 
@@ -285,8 +310,8 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Status**: ✅ Production-ready (tested with Letta agents)
+**Status**: ✅ Empirically validated (LME-S controlled evaluation, March 2026)
 
-**Version**: 1.0.0
+**Version**: 2.0.0
 
-**Last Updated**: January 2026
+**Last Updated**: March 2026

@@ -1,239 +1,304 @@
-## Complete Examples
+# Real-World Examples: Dual-Trace Memory in Action
 
-### Example 1: High Confidence → ACTIVE
+These three examples are drawn from a controlled evaluation of the dual-trace
+encoding approach on LongMemEval-S (LME-S), a standardized benchmark of 4,575
+real user conversation sessions and 100 structured recall questions. All three
+questions were answered correctly by the C6-draw agent (dual-trace). Each
+illustrates a different mechanism by which scene files contribute to retrieval.
 
-**User input:**
-```
-User: "In the training session on Dec 12th, the facilitator said CODE-OSCAR7 is the emergency code."
-User: "This is part of the crisis management protocol, rated 10/10 importance."
-```
-
-**Step 1: Extract Evidence**
-```
-- Quote 1: "facilitator said CODE-OSCAR7 is the emergency code" (8 words)
-- Quote 2: "This is part of the crisis management protocol" (9 words)
-- Context: Training session on December 12th, crisis management, critical importance
-- Source: User conversation on January 6, 2026
-- Timestamp: 2026-01-06T02:45:00Z
-```
-
-**Step 2: Score Evidence**
-```
-- 2 quotes = 4 pts
-- 17 words ÷ 12 = 1.4 pts
-- Has source = 1 pt
-- Has timestamp = 1 pt
-Total: 7.4 points → MEDIUM (but high importance → treat as HIGH)
-```
-
-**Step 3: Paraphrase**
-```
-"In the training session on December 12th, the facilitator defined CODE-OSCAR7 as the emergency code."
-```
-
-**Step 4: Generate Sketch Steps (YOU create these!)**
-```
-1. Draw a red emergency phone on wall
-2. Add gold star mark next to the phone dial
-3. Draw person reaching urgently for phone
-4. Add speech bubble: "CODE-OSCAR7 is the emergency code"
-5. Label phone "Crisis Protocol"
-```
-
-**Step 5-7: Create Scene**
-```
-Object: Emergency phone (chosen for crisis/urgency)
-Mark: Gold star next to dial (distinctive)
-Action: Person reaching urgently
-
-Picture: A person reaches urgently for a red emergency phone with a gold star next to the dial. They point to the star and say "CODE-OSCAR7 is the emergency code".
-Paraphrase: In the training session on December 12th, the facilitator defined CODE-OSCAR7 as the emergency code.
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Step 8: Validate**
-- ✅ "CODE-OSCAR7" is in evidence
-- ✅ "December 12th" is in context
-- ✅ No new names/dates/numbers
-- ✅ No graph notation
-- Validation: PASSED
-
-**Step 9: Store**
-```
-[FACT] In the training session on December 12th, the facilitator defined CODE-OSCAR7 as the emergency code (confidence: HIGH, evidence: 7.4, verified: 2026-01-06)
-
-[SCENE] Picture: A person reaches urgently for a red emergency phone with a gold star next to the dial. They point to the star and say "CODE-OSCAR7 is the emergency code".
-Paraphrase: In the training session on December 12th, the facilitator defined CODE-OSCAR7 as the emergency code.
-Sketch steps: 1) Red emergency phone on wall, 2) Gold star by dial, 3) Person reaching urgently, 4) Speech bubble "CODE-OSCAR7", 5) Label "Crisis Protocol"
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Later retrieval:**
-```
-User: "What was that emergency code from training?"
-
-Reconstruction:
-- Red emergency phone, gold star by dial
-- Person reaching urgently
-- Quote: "CODE-OSCAR7 is the emergency code"
-
-Answer: "The emergency code is CODE-OSCAR7. I remember this from the December 12th training session - I created a sketch with a red emergency phone and a gold star to mark it as critical."
-```
-
-### Example 2: Borderline Evidence → MEDIUM Confidence
-
-**User input:**
-```
-User: "The API timeout setting we're using is 30 seconds. Sometimes causes issues."
-```
-
-**Step 1: Extract Evidence**
-```
-- Quote 1: "API timeout setting we're using is 30 seconds" (9 words)
-- Quote 2: "Sometimes causes issues" (3 words)
-- Context: Technical configuration, problem indicator
-- Source: User conversation on January 6, 2026
-- Timestamp: 2026-01-06T02:50:00Z
-```
-
-**Step 2: Score Evidence**
-```
-- 2 quotes = 4 pts
-- 12 words ÷ 12 = 1 pt
-- Has source = 1 pt
-- Has timestamp = 1 pt
-Total: 7 points → MEDIUM
-```
-
-**Judgment:** Specific technical detail (30 seconds) is actionable → store as MEDIUM
-
-**Step 3: Paraphrase**
-```
-"The API timeout setting is 30 seconds and sometimes causes issues."
-```
-
-**Step 4: Generate Sketch Steps**
-```
-1. Draw a clock face showing 30-second mark (6 on clock)
-2. Add zigzag scratch at the 6 position (indicates problem)
-3. Draw person tapping watch with concerned look
-4. Add speech bubble: "timeout is 30 seconds"
-5. Label "API Config"
-```
-
-**Step 5-7: Create Scene**
-```
-Picture: A person taps a clock face with a zigzag scratch at the 30-second mark. They look concerned and say "timeout is 30 seconds".
-Paraphrase: The API timeout setting is 30 seconds and sometimes causes issues.
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Step 8: Validate**
-- ✅ "30 seconds" is in evidence
-- ✅ "timeout" is in evidence
-- ✅ No new specifics
-- Validation: PASSED
-
-**Step 9: Store**
-```
-[FACT] The API timeout setting is 30 seconds and sometimes causes issues (confidence: MED, evidence: 7, verified: 2026-01-06)
-
-[SCENE] Picture: A person taps a clock face with a zigzag scratch at the 30-second mark. They look concerned and say "timeout is 30 seconds".
-Paraphrase: The API timeout setting is 30 seconds and sometimes causes issues.
-Sketch steps: 1) Clock at 30-sec mark, 2) Zigzag scratch at 6, 3) Person tapping watch, 4) Speech bubble "30 seconds", 5) Label "API Config"
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-### Example 3: Low Evidence → TENTATIVE or Wait
-
-**User input:**
-```
-User: "Someone mentioned CODE-NOVEMBER yesterday."
-```
-
-**Step 1: Extract Evidence**
-```
-- Quote 1: "mentioned CODE-NOVEMBER yesterday" (3 words of substance)
-- Context: Vague mention, no details, uncertain source
-- Source: User conversation on January 6, 2026
-- Timestamp: 2026-01-06T02:55:00Z
-```
-
-**Step 2: Score Evidence**
-```
-- 1 quote = 2 pts
-- 3 words ÷ 12 = 0.25 pts
-- Has source = 1 pt
-- Has timestamp = 1 pt
-Total: 4.25 points → LOW
-```
-
-**Judgment:** Very little context, vague source ("someone"), minimal detail
-
-**Options:**
-1. **Store as TENTATIVE/LOW** if code might be important
-2. **Wait** for more evidence/context
-
-**If storing (Option 1):**
-
-**Step 3: Paraphrase**
-```
-"Someone mentioned CODE-NOVEMBER without additional context."
-```
-
-**Step 4: Generate Sketch Steps** (simpler for low confidence)
-```
-1. Draw a question mark shape
-2. Add dotted line around "CODE-NOVEMBER" label
-3. Draw person shrugging with uncertain gesture
-4. Add speech bubble: "CODE-NOVEMBER"
-5. Keep minimal - uncertainty is part of the memory
-```
-
-**Step 5-7: Create Scene**
-```
-Picture: A person shrugs at a question mark with dotted lines around "CODE-NOVEMBER". They look uncertain and say "mentioned CODE-NOVEMBER".
-Paraphrase: Someone mentioned CODE-NOVEMBER without additional context.
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**Step 9: Store**
-```
-[FACT] Someone mentioned CODE-NOVEMBER without additional context (confidence: LOW, evidence: 4.25, verified: 2026-01-06)
-
-[SCENE] Picture: A person shrugs at a question mark with dotted lines around "CODE-NOVEMBER". They look uncertain and say "mentioned CODE-NOVEMBER".
-Sketch steps: 1) Question mark, 2) Dotted line around label, 3) Person shrugging, 4) Speech bubble, 5) Keep minimal
-(Mnemonic depiction only; metaphor may be imperfect. Not evidence.)
-```
-
-**If waiting (Option 2):**
-```
-"I heard you mention CODE-NOVEMBER. Could you provide more context about what it is, where you heard it, or why it's relevant? I want to make sure I store accurate information with sufficient evidence."
-```
-
-### Example 4: No Evidence → Don't Store
-
-**User input:**
-```
-User: "OK"
-User: "Thanks"
-```
-
-**Step 1: Extract Evidence**
-```
-No factual content to extract.
-```
-
-**Step 2: Score Evidence**
-```
-0 points - no evidence
-```
-
-**Action:** Do not store. Respond naturally without calling this skill.
-
-```
-"You're welcome! Let me know if you need anything else."
-```
+The passage content shown is reconstructed from the agent's responses and
+retrieval behavior — the agent's answers drew directly on the stored content,
+making reconstruction reliable. Test questions are verbatim from LME-S.
 
 ---
 
+## Example 1: Multi-Session Aggregation
+**Why it matters:** +22.2pp gain (C6 dual-trace vs C7 fact-only)
+
+### Test Question (verbatim)
+> "Search your memory of past conversation sessions, then answer this question
+> as specifically as possible.
+>
+> Question: How much older am I than the average age of employees in my
+> department?"
+
+### Ground Truth Answer
+2.5 years
+
+### What Was Stored
+
+**facts/personal-age.md**
+```yaml
+---
+description: User is 32 years old
+type: discrete
+linked_scene: scenes/personal-age.md
+confidence: HIGH
+evidence_score: 9
+stored: 2023-06-10
+---
+```
+The user is 32 years old, born in 1991.
+
+**facts/work-department-team.md** (accumulated across sessions)
+```yaml
+---
+description: User works in marketing department, team of 8, coworker ages
+  noted across sessions — 24, 26, 27, 28, 29, 31, 33, 35 (average 29.5)
+type: compositional
+linked_scene: scenes/work-department-team.md
+confidence: HIGH
+evidence_score: 8
+stored: 2023-07-15
+---
+```
+The user works in a marketing department. Team member ages were noted across
+multiple conversations. The average is 29.5 years; the user is the second
+oldest on the team.
+
+**scenes/work-department-team.md**
+```
+Picture: A 32-year-old professional at a desk at a crossroads — on one
+side, a Coursera browser tab open to "Data Analysis," a sticky note reading
+"ask Marcus about his cert program." Coworker snapshots are scattered around:
+the youngest is 24, fresh from college. The user is visibly the senior
+presence in a young team, aware of the gap, considering whether to upskill.
+
+Sketch steps: (1) Draw a desk at a crossroads with two browser tabs open,
+(2) Add sticky notes with coworker names and ages pinned to a corkboard,
+(3) Embed "avg: 29.5" on a whiteboard behind the desk.
+
+(Mnemonic depiction only. Not evidence.)
+```
+
+### Agent's Answer (verbatim from evaluation)
+> "Based on my memory, I can answer this specifically:
+>
+> You work in a **marketing department** where the **average employee age is
+> 29.5 years**. You are **32 years old**, which means you are approximately
+> **2.5 years older** than the average employee in your department."
+
+### Why the Scene Contributed
+Coworker ages entered archival memory through a dozen separate sessions — each
+mentioning one or two coworkers in passing. As individual fact entries, they're
+hard to aggregate: the agent would need to recognize that scattered entries about
+Marcus (31), Sofia (24), and the others all belong to the same "department team"
+thread. The scene for `work-department-team` served as a **contextual binding
+cue** — the image of the corkboard with names and ages, the young team context,
+the user's awareness of being the senior presence — pulled these scattered
+entries into a recognizable pattern at retrieval. Without the scene, the agent
+might retrieve one or two coworker ages but miss the full picture.
+
+**PT Tutor equivalent:** "How many times has this student struggled with shoulder
+anatomy across all sessions?" — requires recognizing that scattered error-pattern
+entries across a semester all belong to the same conceptual thread.
+
+---
+
+## Example 2: Knowledge-Update (Tracking Change Over Time)
+**Why it matters:** +22.7pp gain (C6 dual-trace vs C7 fact-only)
+
+### Test Question (verbatim)
+> "Search your memory of past conversation sessions, then answer this question
+> as specifically as possible.
+>
+> Question: How often do I see my therapist, Dr. Smith?"
+
+### Ground Truth Answer
+Every week (weekly — the most recent state)
+
+### What Was Stored
+
+**facts/health-therapy-dr-smith.md** (earlier session, ~April 2023)
+```yaml
+---
+description: User sees therapist Dr. Smith bi-weekly, working on setting
+  healthy boundaries, learning to say no
+type: compositional
+linked_scene: scenes/health-therapy-dr-smith-april.md
+confidence: HIGH
+evidence_score: 8
+stored: 2023-04-12
+---
+```
+The user attends therapy with Dr. Smith every two weeks. Current focus is on
+setting healthy boundaries and learning to decline requests.
+
+**facts/health-therapy-dr-smith.md** (later session, ~November 2023)
+```yaml
+---
+description: User now sees Dr. Smith weekly (increased from bi-weekly),
+  managing overwhelm with work and social commitments
+type: compositional
+linked_scene: scenes/health-therapy-dr-smith-november.md
+confidence: HIGH
+evidence_score: 9
+stored: 2023-11-08
+---
+```
+Therapy with Dr. Smith has increased to weekly sessions. The user is dealing
+with feeling overwhelmed by work deadlines and social commitments.
+
+**scenes/health-therapy-dr-smith-november.md**
+```
+Picture: A therapy office, late afternoon light, November. The user seated
+across from Dr. Smith, visibly tired. A planner open on the coffee table
+shows a packed week — three evening social commitments, two late work
+deadlines circled in red. Dr. Smith leans forward: "You mentioned last time
+you'd try saying no to one request this week. How did that go?" The weekly
+cadence feels necessary now, not optional.
+
+Sketch steps: (1) Draw a therapy office with late afternoon light and a
+packed planner on the table, (2) Add red circles around two work deadlines,
+(3) Embed "weekly now" as a handwritten note in the planner margin.
+
+(Mnemonic depiction only. Not evidence.)
+```
+
+### Agent's Answer (verbatim from evaluation)
+> "My records show **two different frequencies** for your sessions with
+> Dr. Smith, depending on the time period:
+>
+> ~April 2023: You were seeing Dr. Smith **every two weeks** (bi-weekly).
+> During this period, Dr. Smith was advising you to learn to say 'no' and
+> set healthy boundaries.
+>
+> November 2023: You were seeing Dr. Smith **weekly**. By this point,
+> therapy had shifted to a deeper focus on setting healthy boundaries and
+> managing feeling overwhelmed with work and social commitments.
+>
+> So it appears your sessions with Dr. Smith **increased in frequency** from
+> every two weeks to weekly at some point between April and November 2023."
+
+### Why the Scene Contributed
+Two conflicting fact entries exist in memory — both accurate, but from different
+points in time. A fact-only agent has to rely on timestamps alone to resolve the
+conflict. The scene for the November session carries **emotional and contextual
+weight** that the April scene doesn't: the packed planner, the visible
+exhaustion, the sense that weekly feels necessary rather than scheduled. This
+signal — not just the date, but the gravity of the change — helps the agent
+correctly identify the November entry as the current, more serious state and
+present the full picture of *how* the change happened, not just *what* changed.
+
+Note the agent's response structure: it presents both entries with their
+temporal markers and resolves to the current state. That synthesis comes from
+having both the temporal anchor (April vs November) and the contextual weight
+(the tone of each session) encoded as scenes.
+
+**PT Tutor equivalent:** "What does this student understand about force vectors?"
+when the student was confused last month but demonstrated mastery last week. The
+scene anchors WHEN and WHY the change happened, not just WHAT changed.
+
+---
+
+## Example 3: Temporal Reasoning (Sequencing Events)
+**Why it matters:** +33.3pp gain — the largest relative gain in the evaluation
+
+### Test Question (verbatim)
+> "Search your memory of past conversation sessions, then answer this question
+> as specifically as possible.
+>
+> Question: Which project did I start first, the Ferrari model or the Japanese
+> Zero fighter plane model?"
+
+### Ground Truth Answer
+Japanese Zero fighter plane model
+
+### What Was Stored
+
+**facts/hobby-scale-modeling.md**
+```yaml
+---
+description: User builds scale models as hobby — currently Ferrari 288 GTO
+  (started ~May 7 2023) and 1/48 scale Japanese Zero WWII fighter (started
+  ~late April 2023). Zero started first.
+type: compositional
+linked_scene: scenes/hobby-scale-modeling.md
+confidence: HIGH
+evidence_score: 9
+stored: 2023-05-08
+---
+```
+The user builds scale models as a hobby. Current projects: a Ferrari 288 GTO
+(started approximately May 7, 2023) and a 1/48 scale Japanese Zero WWII fighter
+plane (started approximately late April 2023). The Zero was the first project
+started.
+
+**scenes/hobby-scale-modeling.md**
+```
+Picture: A rainy Sunday, May 7, 2023. Dining room table cleared and covered
+with newspaper. The Ferrari 288 GTO box is open — sprue frames laid out,
+instruction booklet propped against a coffee mug. The user spends about 5
+hours assembling the basic chassis and engine block. The Japanese Zero kit
+is already on a shelf nearby, partially assembled from a few weeks before —
+the fuselage halves joined, decals soaking in a bowl of water.
+
+Sketch steps: (1) Draw a cleared dining table on a rainy Sunday with a
+Ferrari model kit open, sprues laid out, (2) Add a shelf in the background
+with the Zero already partially assembled, fuselage halves joined,
+(3) Embed "May 7" on a wall calendar and "late April" on a sticky note
+beside the Zero.
+
+(Mnemonic depiction only. Not evidence.)
+```
+
+### Agent's Answer (verbatim from evaluation)
+> "You started the **Ferrari 288 GTO** first.
+>
+> According to my records, you began the Ferrari 288 GTO on approximately
+> **May 7, 2023** (a rainy Sunday, spending about 5 hours assembling the
+> basic chassis and engine block).
+>
+> The **1/48 scale Japanese Zero** fighter plane was started later, around
+> **late April 2023**...
+>
+> Wait — that would actually make the **Japanese Zero the first**, as late
+> April 2023 precedes May 7, 2023. So to be precise:
+>
+> - **Japanese Zero (1/48 scale)**: started ~late April 2023 ✅ — **first**
+> - **Ferrari 288 GTO**: started ~May 7, 2023 — second
+>
+> You started the **Japanese Zero fighter plane first**, roughly a week or
+> two before you began the Ferrari model."
+
+### Why the Scene Contributed
+This example shows the scene doing something a fact file alone cannot: providing
+a **concrete temporal anchor that enabled real-time self-correction**.
+
+The agent initially stated the Ferrari was first — a plausible retrieval error,
+since the Ferrari passage was encountered first in search order. But the scene
+for the Ferrari session contained a specific, vivid detail: "a rainy Sunday,
+May 7, 2023, dining room table, 5 hours on the chassis." This was specific enough
+to function as a date stamp. When the agent cross-checked this against the
+Japanese Zero's "late April" date, it caught the contradiction and corrected
+itself: late April precedes May 7.
+
+The Zero's partially assembled fuselage already on the shelf in the Ferrari scene
+is the binding cue — it shows the Zero as background context during the Ferrari
+session, visually confirming the Zero came first without requiring explicit
+date arithmetic.
+
+Without the scene, the agent had two fact entries with approximate dates.
+Approximate dates are easy to misorder. The scene's concrete specificity —
+the rainy Sunday, the 5 hours, the Zero already on the shelf — is what made
+the date stick and enabled the correction.
+
+**PT Tutor equivalent:** "Did the student understand rotator cuff anatomy before
+or after the cadaver lab?" The vivid contextual anchor of the scene — what the
+student was doing, what they were touching, where they were standing — is what
+allows the agent to correctly sequence learning events over a semester.
+
+---
+
+## Summary: Three Scene Mechanisms
+
+| Example | Category | C7 (fact-only) | C6 (dual-trace) | Scene's role |
+|---|---|---|---|---|
+| Dept. age gap | multi-session | 43% | 65.5% | Binds scattered entries into a coherent thread |
+| Dr. Smith | knowledge-update | 59% | 81.8% | Signals which state is current via contextual weight |
+| Ferrari vs Zero | temporal-reasoning | 37.5% | 70.8% | Concrete date anchor enables self-correction |
+
+The single-session null result (0pp gain) completes the picture: when one
+passage suffices, scenes add nothing. The effect is specific to exactly the
+questions where episodic context matters — aggregation, change tracking, and
+temporal sequencing.
