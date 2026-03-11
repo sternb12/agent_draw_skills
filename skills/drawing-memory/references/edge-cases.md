@@ -18,7 +18,7 @@ Evidence:
 
 Score:
 - 2 quotes = 4 pts
-- 18 words ÷ 12 = 1.5 pts
+- 18 words / 12 = 1.5 pts
 - Source + timestamp = 2 pts
 Total: 7.5 points -> MEDIUM, but specific technical values -> treat as HIGH
 ```

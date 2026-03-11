@@ -17,7 +17,7 @@ Maximum: 10 points
 
 ### Quote Length Points (max 4)
 
-**Formula:** `(Total words across all quotes) ÷ 12`
+**Formula:** `(Total words across all quotes) / 12`
 
 **Cap at 4 points**
 
@@ -47,7 +47,7 @@ Evidence:
 
 Calculation:
 - Quote count: 3 quotes = 6 pts
-- Length: 20 words ÷ 12 = 1.67 pts
+- Length: 20 words / 12 = 1.67 pts
 - Source: +1 pt
 - Timestamp: +1 pt
 Total: 9.67 points -> HIGH confidence
@@ -63,7 +63,7 @@ Evidence:
 
 Calculation:
 - Quote count: 2 quotes = 4 pts
-- Length: 13 words ÷ 12 = 1.08 pts
+- Length: 13 words / 12 = 1.08 pts
 - Source: +1 pt
 - Timestamp: +1 pt
 Total: 7.08 points -> MEDIUM confidence
@@ -78,7 +78,7 @@ Evidence:
 
 Calculation:
 - Quote count: 1 quote = 2 pts
-- Length: 2 words ÷ 12 = 0.17 pts
+- Length: 2 words / 12 = 0.17 pts
 - Source: +1 pt
 - Timestamp: +1 pt
 Total: 4.17 points -> LOW confidence
@@ -117,7 +117,7 @@ Quote: "According to the documentation updated on March 15th, the retry mechanis
 
 Math score:
 - 1 quote = 2 pts
-- 30 words ÷ 12 = 2.5 pts
+- 30 words / 12 = 2.5 pts
 - Source + timestamp = 2 pts
 Total: 6.5 points
 
@@ -137,7 +137,7 @@ Quote 3: "SSL is disabled" (3 words)
 
 Math score:
 - 3 quotes = 6 pts
-- 9 words ÷ 12 = 0.75 pts
+- 9 words / 12 = 0.75 pts
 - Source + timestamp = 2 pts
 Total: 8.75 points -> HIGH
 
@@ -151,7 +151,7 @@ Quote: "I think it was something like 30 or 60 seconds" (10 words)
 
 Math score:
 - 1 quote = 2 pts
-- 10 words ÷ 12 = 0.83 pts
+- 10 words / 12 = 0.83 pts
 - Source + timestamp = 2 pts
 Total: 4.83 points
 

@@ -28,7 +28,7 @@ Drawing creates an **integrated memory trace** with three critical components:
    - Creating connections and relationships
    - Active interpretation vs. passive reception
 
-2. **Motor Component** ⭐
+2. **Motor Component** *
    - Physical act of creating (doing, not just reading)
    - Generative process engages deeper processing
    - *Critical insight*: The benefit requires YOU doing the work
@@ -165,28 +165,28 @@ a sketch of a red emergency phone with a gold star marking it..."
 
 ```
 skills/drawing-memory/
-├── SKILL.md (777 lines)
-│   ├── 9-step encoding workflow
-│   ├── Retrieval workflow with scene reconstruction
-│   ├── Evidence scoring (0-10 scale)
-│   ├── Metaphor catalog (50+ options)
-│   └── Troubleshooting guide
-│
-├── README.md
-│   └── Skill overview
-│
-├── examples/
-│   └── edge-cases.md (10 worked examples)
-│       ├── High evidence (score 8-10)
-│       ├── Medium evidence (score 5-7)
-│       ├── Low evidence (score 0-4)
-│       └── Edge cases (sensitive, timestamps, etc.)
-│
-└── references/
-    └── evidence-scoring-details.md
-        ├── Complete scoring formulas
-        ├── Routing logic (DROP/TENTATIVE/ACTIVE)
-        └── Mathematical basis
++-- SKILL.md (777 lines)
+|   +-- 9-step encoding workflow
+|   +-- Retrieval workflow with scene reconstruction
+|   +-- Evidence scoring (0-10 scale)
+|   +-- Metaphor catalog (50+ options)
+|   +-- Troubleshooting guide
+|
++-- README.md
+|   +-- Skill overview
+|
++-- examples/
+|   +-- edge-cases.md (10 worked examples)
+|       +-- High evidence (score 8-10)
+|       +-- Medium evidence (score 5-7)
+|       +-- Low evidence (score 0-4)
+|       +-- Edge cases (sensitive, timestamps, etc.)
+|
++-- references/
+    +-- evidence-scoring-details.md
+        +-- Complete scoring formulas
+        +-- Routing logic (DROP/TENTATIVE/ACTIVE)
+        +-- Mathematical basis
 ```
 
 ## Documentation

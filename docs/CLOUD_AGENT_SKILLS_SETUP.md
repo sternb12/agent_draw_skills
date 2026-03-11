@@ -122,7 +122,7 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 
 ### If Using Letta Cloud Web UI:
 
-**⚠️ CRITICAL:** The Skill tool executes **client-side**, which means:
+**WARNING CRITICAL:** The Skill tool executes **client-side**, which means:
 - You need to run Letta Code CLI connected to the cloud agent
 - Web UI alone may not execute the Skill tool properly
 - Skills directory must be accessible from where you run Letta Code

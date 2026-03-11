@@ -68,7 +68,7 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 1. Extract evidence (quotes, context, source, timestamp)
 2. Score evidence (0-10, flexible thresholds)
 3. Paraphrase (elaboration component)
-4. **Generate sketch steps** (motor component) ⭐
+4. **Generate sketch steps** (motor component) *
 5. Choose metaphor (vary to avoid interference)
 6. Add distinctive mark
 7. Create scene text
@@ -78,7 +78,7 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 ### RETRIEVAL (When Answering)
 
 1. Search for relevant facts
-2. **Reconstruct scene** (context reinstatement) ⭐
+2. **Reconstruct scene** (context reinstatement) *
 3. Use scene as retrieval cue
 4. Answer with fact + scene context
 
