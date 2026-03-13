@@ -13,9 +13,9 @@ works by forcing elaborative encoding: each piece of information is stored as
 two linked archival passages -- a structured fact trace and a vivid scene trace
 with concrete imageable detail. The mechanism is elaborative generation, not
 motor encoding. The agent generates the scene text itself, which produces richer
-encoding than receiving pre-computed output, but this is not equivalent to the
+encoding than receiving pre-computed output, but this is distinct from the
 motor component of human drawing (visuospatial planning, fine motor control,
-perceptual feedback). Do not claim or imply motor equivalence.
+perceptual feedback).
 
 ## Architecture
 
