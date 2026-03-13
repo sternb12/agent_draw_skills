@@ -3,6 +3,9 @@
 Research-backed memory encoding for `letta_v1_agent` -- validated at +19.7
 percentage points overall accuracy on LongMemEval-S versus fact-only encoding.
 
+- This creation and organization of this repository was accomplished with
+  assistance from a Letta Code agent.
+
 ---
 
 ## What It Does
