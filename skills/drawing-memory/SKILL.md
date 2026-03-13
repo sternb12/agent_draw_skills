@@ -342,7 +342,7 @@ Total 0-6:    0-2=DROP       3-6=FULL
 Agent type:  letta_v1_agent
 Tools:       archival_memory_insert, archival_memory_search,
              memory_replace, conversation_search
-Model:       anthropic/claude-sonnet-4-6 (or equivalent)
+Model:       anthropic/claude-sonnet-4-6 (used in evaluation -- recommended)
 Persona:     Load this skill's instructions into system/persona block
 ```
 

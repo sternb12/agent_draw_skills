@@ -34,7 +34,7 @@ The +19.7 percentage point difference is the contribution of the scene traces.
 Go to https://app.letta.com and create a new agent.
 
 - Agent type: letta_v1_agent (the default)
-- Model: claude-sonnet-4-6 (or your preferred model)
+- Model: claude-sonnet-4-6 (recommended -- used in the LME-S evaluation)
 - Name: anything descriptive, e.g. "dual-trace-memory-agent"
 
 ### 2. Add the required tools

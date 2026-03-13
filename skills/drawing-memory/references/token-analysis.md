@@ -1,7 +1,7 @@
 # Token Usage: Dual-Trace vs Fact-Only
 
 Measured on LongMemEval-S recall evaluation: 100 questions each condition,
-same agent model (Claude Sonnet), same 4,575-session teach corpus.
+same agent model (Claude Sonnet 4.6), same 4,575-session teach corpus.
 
 ## Per-Question Token Usage
 

@@ -73,6 +73,10 @@ real-world examples showing each retrieval mechanism in action.
 - Python 3.9+ with the Letta Python SDK: `pip install letta-client`
 - Git
 
+> **Recommended model:** All LME-S evaluation runs (C6 and C7) used
+> `anthropic/claude-sonnet-4-6`. The 73.7% accuracy result is specific to
+> this model. We recommend using claude-sonnet-4-6 to replicate the results.
+
 ### Step 1 -- Clone this repository
 
 ```bash
