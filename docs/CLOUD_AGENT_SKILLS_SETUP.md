@@ -149,6 +149,10 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 
 **Common Issues:**
 
+**Ask Ezra**
+- If you run into issues, @Ezra is an invaluable resource!
+- You can chat with Ezra in Letta's Discord
+
 **Issue: Agent doesn't call Skill tool**
 - Check that `skills` block is visible to agent
 - Try explicitly: "Use the drawing-memory skill to store this"
