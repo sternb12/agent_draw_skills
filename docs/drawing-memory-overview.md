@@ -20,9 +20,9 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 
 ## Key Features
 
-### Critical Components (Research-Backed)
+### Critical Components
 
-1. **Motor Component** - Agent generates sketch steps (not auto-generated)
+1. **Motor Component** - Agent generates sketch steps
 2. **Retrieval Guidance** - Scene reconstruction for context reinstatement
 3. **Flexible Thresholds** - Guidelines over rigid rules (5-7 acceptable, not just 8+)
 4. **Natural Language** - No JSON formatting required
@@ -84,7 +84,7 @@ Based on Fernandes et al. (2018) findings that drawing beats writing, visualizat
 
 ## Critical Success Factors
 
-[x] Agent generates sketch steps (motor component)  
+[x] Agent generates sketch steps  
 [x] Agent reconstructs scenes at retrieval  
 [x] Vary metaphors (distinctiveness)  
 [x] Use flexible thresholds (judgment over rules)  
