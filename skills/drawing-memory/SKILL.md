@@ -38,7 +38,7 @@ Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Identical evidence
 rates (~63-65%), identical archival passage format, same letta_v1_agent
 architecture. Only variable: presence or absence of scene traces.
 
-  Overall:            +19.7 pp (73.7% vs 54%)
+  Overall:            +19.7 percentage points (pp), (73.7% vs 54%)
   Temporal-reasoning: +33.3 pp -- scene anchors enable temporal sequencing
   Knowledge-update:   +22.7 pp -- scene weight signals which state is current
   Multi-session:      +22.2 pp -- scenes bind scattered passages into threads
