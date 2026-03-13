@@ -29,7 +29,7 @@ In Letta Cloud UI:
   4. Content (copy exactly):
 
 --------------------------------------------------------------------------------
-Skills Directory: /Users//letta_eval/.skills
+Skills Directory: /path/to/your/agent_draw_skills/.skills
 
 Available Skills:
 
@@ -78,7 +78,7 @@ STEP 5: CONNECT VIA LETTA CODE CLI
 
 Open terminal and run:
 
-cd /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT\ Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval
+cd /path/to/your/agent_draw_skills
 
 letta --agent <your-agent-id>
 
@@ -250,7 +250,7 @@ ALTERNATIVE: LOCAL AGENT WITH AUTO-DISCOVERY
 
 If cloud agent approach is problematic, use local agent:
 
-cd /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT\ Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval
+cd /path/to/your/agent_draw_skills
 
 letta --new
 

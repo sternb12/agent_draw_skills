@@ -168,7 +168,7 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 If cloud agent approach is problematic, use local agent:
 
 ```bash
-cd /Users/..testing/letta_eval/Cloud_eval
+cd /path/to/your/agent_draw_skills
 
 letta --new
 ```
