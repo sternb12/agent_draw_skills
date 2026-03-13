@@ -29,7 +29,7 @@ In Letta Cloud UI:
   4. Content (copy exactly):
 
 --------------------------------------------------------------------------------
-Skills Directory: /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval/.skills
+Skills Directory: /Users//letta_eval/.skills
 
 Available Skills:
 
@@ -107,7 +107,7 @@ Send:
 Expected Behavior:
   1. Agent sees drawing-memory matches this task
   2. Agent calls: Skill(command="load", skills=["drawing-memory"])
-  3. ⚠️ APPROVAL DIALOG APPEARS - YOU MUST APPROVE
+  3. APPROVAL DIALOG APPEARS - YOU MUST APPROVE
   4. Check Letta Cloud Memory tab: loaded_skills should have ~777 lines!
   5. Agent follows 9-step workflow from skill:
      - Extracts evidence
@@ -195,12 +195,12 @@ SUCCESS CRITERIA
 
 You'll know it's working when:
 
-1. ✅ Agent loads skill without errors
-2. ✅ loaded_skills block contains full SKILL.md content (check memory tab)
-3. ✅ Agent GENERATES own sketch steps (not auto-generated)
-4. ✅ Agent stores both FACT and SCENE in human block
-5. ✅ Agent RECONSTRUCTS scene when answering recall question
-6. ✅ Agent unloads skill after use (frees context)
+1. Agent loads skill without errors
+2. loaded_skills block contains full SKILL.md content (check memory tab)
+3. Agent GENERATES own sketch steps (not auto-generated)
+4. Agent stores both FACT and SCENE in human block
+5. Agent RECONSTRUCTS scene when answering recall question
+6. Agent unloads skill after use (frees context)
 
 The KEY difference from the tool:
   • Tool: Agent calls function, gets result (PASSIVE)
@@ -318,8 +318,7 @@ Documentation:
   SKILLS_ARCHITECTURE_DIAGRAM.md (visual architecture guide)
   setup_guide.txt (this file)
 
-All located in:
-  /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval/
+
 
 
 ================================================================================
