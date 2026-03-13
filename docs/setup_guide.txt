@@ -23,7 +23,7 @@ In Letta Cloud UI:
   2. Click "Add Memory Block"
   3. Configure:
      - Name: skills
-     - Read-Only: ✅ CHECK THIS BOX
+     - Read-Only: CHECK THIS BOX
      - Description: Catalog of available skills with metadata
 
   4. Content (copy exactly):
@@ -45,7 +45,7 @@ In Letta Cloud UI:
   1. Click "Add Memory Block" again
   2. Configure:
      - Name: loaded_skills
-     - Read-Only: ✅ CHECK THIS BOX
+     - Read-Only: CHECK THIS BOX
      - Description: Full content of actively loaded skills (updated by Skill tool)
 
   3. Content (leave empty or use):
@@ -73,7 +73,7 @@ The Skill tool should show:
 
 STEP 5: CONNECT VIA LETTA CODE CLI
 -----------------------------------
-⚠️ CRITICAL: You MUST use CLI, not web UI
+CRITICAL: You MUST use CLI, not web UI
    Skill tool executes client-side (needs filesystem access to .skills/)
 
 Open terminal and run:
@@ -261,46 +261,6 @@ Benefits:
   • Same skill content, easier testing
 
 
-================================================================================
-WHAT WE'RE TESTING
-================================================================================
-
-This skill approach should OUTPERFORM the process_memory_v4 tool because:
-
-1. Flexible Thresholds
-   Tool: Rigid score >= 8 required (71% TENTATIVE)
-   Skill: Score 5-7 OK with judgment (expected 60%+ ACTIVE)
-
-2. Motor Component
-   Tool: Auto-generates sketch steps (agent passive)
-   Skill: Agent generates sketch steps (agent active = drawing effect!)
-
-3. Retrieval Guidance
-   Tool: No retrieval component
-   Skill: Agent reconstructs scene before answering (context reinstatement)
-
-4. Natural Language
-   Tool: JSON formatting required
-   Skill: Natural evidence identification
-
-5. Processing Rate
-   Tool: 70% processed (30% skipped as "not enough evidence")
-   Skill: Expected 90%+ processed (flexible guidelines)
-
-
-================================================================================
-EXPECTED PERFORMANCE IMPROVEMENTS
-================================================================================
-
-Compared to Tool (process_memory_v4):
-  • Processing rate: 70% → 90%+ (more flexible)
-  • ACTIVE rate: 29% → 70%+ (better thresholds)
-  • Recall accuracy: +15-25% (scene-based context)
-
-Compared to NoDraw (Control):
-  • Exact recall: +15-25% expected
-  • Keyphrase recall: +10-20% expected
-  • Foil rejection: +10-15% expected
 
 
 ================================================================================
@@ -321,23 +281,6 @@ Documentation:
 
 
 
-================================================================================
-NEXT STEPS AFTER SUCCESSFUL TEST
-================================================================================
-
-1. Run mini A/B test (10 teach + 10 recall samples):
-   - Skill-Agent (this agent with drawing-memory skill)
-   - Tool-Agent (cloud agent with process_memory_v4)
-   - NoDraw-Agent (control, standard memory)
-
-2. Compare metrics:
-   - Processing rate (% samples processed)
-   - ACTIVE rate (% stored with HIGH/MED confidence)
-   - Recall accuracy (exact, keyphrase, foil)
-
-3. If skill wins: Run full dataset (40 teach + 30 recall)
-
-4. If skill ties or loses: Analyze why, iterate on SKILL.md
 
 
 ================================================================================
