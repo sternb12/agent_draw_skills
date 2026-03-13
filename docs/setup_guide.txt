@@ -9,10 +9,10 @@ Go to: https://app.letta.com
 Option A - Create new agent:
   • Click "New Agent"
   • Name: Skill-Test-Agent
-  • Model: Claude 3.5 Sonnet (recommended)
+  • Model: Claude 4.6 Sonnet (recommended)
 
 Option B - Use existing agent:
-  • Draw-Agent2: agent-0663d267-6ed9-4282-a75a-d3210414440e
+  • Draw-Agent2: 
   • Or any other cloud agent
 
 
