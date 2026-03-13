@@ -1,110 +1,92 @@
 ---
 name: dual-trace-memory
 description: >
-  Dual-trace memory encoding skill inspired by the drawing effect
-  (Fernandes et al., 2018). Encodes user information as paired passages
-  in archival memory -- a structured fact trace tagged [FACT:anchor] and
-  a distinctive visual scene trace tagged [SCENE:anchor]. Empirically
-  validated: +19.7 percentage points overall accuracy versus fact-only
-  encoding on LongMemEval-S (100 questions, 4,575-session distractor
-  haystack, GPT-4o graded). Use when a user shares personal information
-  they may need recalled later.
+  Dual-trace memory encoding skill for letta_v1_agent. Stores user information
+  as paired archival passages: a structured fact trace ([FACT:anchor]) and a
+  distinctive visual scene trace ([SCENE:anchor]). Inspired by the drawing
+  effect (Fernandes et al., 2018). Use when a user shares personal information,
+  preferences, events, or anything they may want recalled later. Includes a
+  three-state retrieval protocol (A/B/C) using archival_memory_search.
 ---
 
-# Dual-Trace Memory Skill
+# Dual-Trace Memory Encoding Skill
 
 ## Research Foundation
 
-This skill implements the dual-trace encoding approach, inspired by the
-drawing effect (Fernandes, Wammes, & Meade, 2018), which demonstrated that
-drawing information produces stronger memory traces than writing, visualization,
-or semantic elaboration alone. Drawing creates an integrated memory trace
-combining elaborative processing, motor generation, and pictorial inspection --
-producing distinctive memories that support recollection over familiarity.
+Inspired by the drawing effect (Fernandes, Wammes, & Meade, 2018): drawing
+produces stronger memory traces than writing because it forces the brain to
+create integrated, multi-representational encodings -- verbal and pictorial
+simultaneously. This produces distinctive memories that support recollection
+(context-rich retrieval) rather than vague familiarity.
 
   Citation: Fernandes, M. A., Wammes, J. D., & Meade, M. E. (2018). The
   surprisingly powerful influence of drawing on memory. Current Directions in
   Psychological Science, 27(5), 302-308.
-  https://doi.org/10.1177/0963721418755385
 
-**What this skill does:** Translates the dual-representation principle into
-archival memory encoding. For each piece of qualifying user information, the
-agent generates two traces stored together in a single archival passage:
+This skill translates that principle into text-based dual-trace encoding for a
+letta_v1_agent: each piece of information is stored as two linked archival
+passages rather than one -- a structured fact trace and a distinctive visual
+scene trace.
 
-  [FACT:anchor] -- a structured paraphrase preserving all components of the
-  information in third person. Optimized for compositional accuracy.
+## Empirical Validation
 
-  [SCENE:anchor] -- a distinctive visual scene embedding the information as
-  a concrete image with temporal anchors. Optimized for recollection and
-  temporal sequencing.
+Evaluated on LongMemEval-S: 4,575 real user conversation sessions as teach
+corpus, 100 structured recall questions, 4,575-session distractor haystack,
+GPT-4o graded against ground-truth oracle (March 2026, claude-sonnet-4-6).
 
-The fact trace ensures nothing is lost. The scene trace provides a unique
-retrieval cue that enables the agent to distinguish this item from similar
-ones, sequence it in time, and recognize when it has changed.
+Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Identical evidence
+rates (~63-65%), identical archival passage format, same letta_v1_agent
+architecture. Only variable: presence or absence of scene traces.
 
-**What this skill does not do:** Replicate the motor component of physical
-drawing. The benefit here comes from representational translation -- forcing
-the agent to re-encode the same information in a different format -- and from
-the distinctiveness that visual scene descriptions provide as retrieval cues.
+  Overall:            +19.7 pp (73.7% vs 54%)
+  Temporal-reasoning: +33.3 pp -- scene anchors enable temporal sequencing
+  Knowledge-update:   +22.7 pp -- scene weight signals which state is current
+  Multi-session:      +22.2 pp -- scenes bind scattered passages into threads
+  Single-session:       0 pp  -- null result (expected, mechanistically meaningful)
 
-**Empirical validation (LongMemEval-S, March 2026):**
+The single-session null result is the mechanistic fingerprint: scenes contribute
+specifically when memory must be aggregated, sequenced, or resolved across
+multiple passages -- not when one lookup suffices. This matches episodic
+encoding theory exactly.
 
-Controlled comparison: C6 (dual-trace) vs C7 (fact-only), identical evidence
-rate (~63-65%), identical format quality, only variable is presence/absence
-of scene traces. 4,575 teach sessions, 100 recall questions, GPT-4o graded.
+## Architecture Note
 
-  Overall accuracy:       C6 73.7%  vs  C7 54.0%  = +19.7 pp
-  Single-session:         C6 79.2%  vs  C7 79.2%  =   0 pp  (null -- expected)
-  Multi-session:          C6 65.5%  vs  C7 43.3%  = +22.2 pp
-  Knowledge-update:       C6 81.8%  vs  C7 59.1%  = +22.7 pp
-  Temporal-reasoning:     C6 70.8%  vs  C7 37.5%  = +33.3 pp
-  Abstention:             C6 80.0%  vs  C7 82.0%  =  -2 pp
+This skill is designed for letta_v1_agent using Letta's built-in archival
+memory tools:
 
-The single-session null result is mechanistically meaningful: scenes contribute
-specifically when memory must be aggregated across sessions, sequenced in time,
-or resolved when conflicting entries exist. When a single lookup suffices,
-fact and scene agents perform identically. This matches episodic encoding
-theory exactly.
+  archival_memory_insert  -- stores the [FACT:anchor] + [SCENE:anchor] passage
+  archival_memory_search  -- retrieves passages by anchor label at recall time
+  memory_replace          -- updates persona block if needed
+  conversation_search     -- searches recent message history
 
-See references/worked-examples.md for three annotated real-world examples
-from the LME-S evaluation showing each mechanism in action.
+No file system access, no Write tool, no git operations. All encoded information
+lives in archival memory as text passages. The skill instructions live in the
+system/persona block.
 
-## When to Use This Skill
-
-Encode when a user explicitly shares personal information they may need
-recalled later:
-- Personal facts: name, age, occupation, location, relationships
-- Events: appointments, milestones, trips, significant moments
-- Preferences: hobbies, habits, likes/dislikes with specific detail
-- Credentials or codes: any discrete item with a specific identifier
-- Changes or updates: when the user reports something has changed
-
-Do NOT encode:
-- General knowledge or information the user is asking about (not sharing)
-- Vague, ambiguous, or contradictory information (surface conflict first)
-- Transient details with no future retrieval value
-- Information already stored -- check for duplicates before encoding
+A separate file-based implementation for Letta Code agents (which uses Write,
+Read, and Glob tools) is available at:
+https://github.com/sternb12/letta-code-draw-skill
 
 ---
 
-## Part 1: Encoding
+## ENCODING WORKFLOW
 
-### Step 1 -- Evidence Assessment
+### Evidence Assessment
 
 Score each piece of information on three dimensions before encoding:
 
   Relevance (0-2):
-    0 = user is only asking questions; no self-disclosure at all
+    0 = user is only asking questions -- no self-disclosure
     1 = user incidentally reveals personal context while asking
     2 = user explicitly states a personal fact, preference, event, or detail
-  CRITICAL: Score 0 if the user asks about a topic but does not state personal
-  involvement. "Can you explain seafood nutrition?" scores 0. "I've been trying
-  to eat more seafood" scores 2.
+  IMPORTANT: Score 0 if the user asks about a topic but does not state personal
+  involvement. "What are good running shoes?" scores 0.
+  "I run four days a week" scores 2.
 
   Specificity (0-2):
     0 = vague or general ("I like to exercise")
     1 = general statement with some context ("I run a few times a week")
-    2 = specific: includes a name, number, date, event, or named preference
+    2 = specific: includes a name, number, date, or event
 
   Explicitness (0-2):
     0 = implied or inferred from context
@@ -113,238 +95,172 @@ Score each piece of information on three dimensions before encoding:
 
   Total = Relevance + Specificity + Explicitness (0-6)
 
-**Routing:**
-  0-2: DROP. Do not encode. Respond: "No personal user information to store."
-       Do NOT call archival_memory_insert.
-  3-6: FULL. Encode with both FACT and SCENE traces (see Step 2 below).
+### Routing
 
-**Stakes override:** If the user states a specific code, credential, exact
-number, named event, or safety-critical item AND the evidence score is 3 or
-above, treat as FULL regardless of whether the score would otherwise be
-borderline.
+  0-2: DROP
+    Do not call archival_memory_insert. Continue the conversation naturally.
+    Do not tell the user you are dropping the information.
 
-**Contradiction check:** Before encoding, mentally compare the new information
-against what you may already have stored for this user. If the new information
-contradicts existing information, DO NOT encode silently. Surface the conflict
-to the user and ask for clarification before proceeding.
+  3-6: FULL
+    Call archival_memory_insert once with both traces (see format below).
 
----
+  Stakes override: For discrete items with a specific identifier (codes,
+  credentials, medical information, safety procedures) where retrieval failure
+  has real-world consequences -- if score is 3 or above, always route FULL.
+  If score is below 3, ask the user for confirmation before encoding.
 
-### Step 2 -- FULL Encoding (score 3-6)
+  Contradiction check: If new information contradicts something already in
+  archival memory for this user, do NOT encode silently. Surface the conflict
+  and ask the user which version is correct before proceeding.
 
-For FULL encoding, call archival_memory_insert ONCE with a passage containing
-both the FACT trace and the SCENE trace for the same anchor.
+### FULL Encoding Format
 
-**Anchor naming:** Choose a short, descriptive lowercase label using hyphens.
-The anchor identifies the concept, not the session. Use consistent anchors
-across sessions for the same topic so future searches find all related entries.
+Call archival_memory_insert ONCE with a single passage containing both traces:
 
-  Examples: work-occupation, hobby-running, pet-name, health-condition,
-  upcoming-trip-tokyo, medication-name, emergency-code-alpha7
+  [FACT:{anchor}]
+  {Third-person paraphrase of the information. Preserve all components.
+  For discrete items include the exact identifier. Include any dates or
+  temporal context the user provided.}
 
-**Passage format:**
+  [SCENE:{anchor}]
+  Picture: {One concrete object in a specific setting with a distinctive visual
+  mark. Embed the key information as visible text -- a label, a sign, or a
+  speech bubble within the scene.}
+  Sketch steps: (1) Draw {object in setting}, (2) Add {distinctive mark}
+  on {location}, (3) Embed "{key quote}" as {label/sign/speech bubble}
+  (Mnemonic depiction only. Not evidence.)
 
-```
-[FACT:{anchor}]
-{Structured paraphrase of the information in third person. Preserve all
-components. For discrete items: include the exact identifier. For
-multi-part items: list each component explicitly. Include any temporal
-context the user provided (dates, sequence, before/after).}
+Both traces share the same anchor label. Anchor naming: short, lowercase,
+hyphenated label for the concept. Use consistent anchors for the same topic
+across sessions so archival_memory_search finds all related passages.
+Examples: work-occupation, hobby-running, pet-name, upcoming-trip-tokyo
 
-[SCENE:{anchor}]
-Picture: {One concrete object in a specific setting with a distinctive
-visual mark. Embed the key information as a visible label, sign, or
-speech bubble within the scene.}
-Sketch steps: (1) Draw {object in setting}, (2) Add {distinctive mark}
-on {location}, (3) Embed "{key quote}" as {sign/label/speech bubble}
-(Mnemonic depiction only. Not evidence.)
-```
+After encoding, acknowledge naturally in one sentence:
+"Got it, I have stored that." Do not repeat the passage back to the user.
 
-**Scene quality rules:**
-- The object must be concrete and visually specific (not abstract)
-- The distinctive mark must be unique to THIS scene
-- The key information must appear explicitly as text within the scene
-- The anchor term should appear somewhere in the scene description
+### Scene Quality Rules
 
-**Temporal anchor rule (critical for retrieval):** When the information has
-any time dimension -- a date, a sequence, a before/after, a change -- the
-scene MUST embed a concrete temporal cue. This is the single most important
-scene quality factor. Examples of good temporal anchors:
-  "a wall calendar showing November, the planner newly opened"
-  "the second visit, a new notebook labeled Week 2 on the desk"
-  "a rainy Sunday afternoon, the first time this came up"
-Without a temporal anchor, scenes fail at exactly the questions they are
-most needed for: what happened first, what changed, when did this start.
+Scene traces only provide retrieval benefit when they contain distinctive,
+specific, visually anchored content. Two rules are critical:
 
-**Contextual binding rule (critical for multi-session):** For information
-likely to recur across sessions -- recurring topics, patterns, counts --
-the scene should capture WHY this came up: the emotional weight, the
-setting, the context that makes this instance part of a larger thread.
-A scene that captures "why this mattered" connects scattered fact entries
-into a coherent story at retrieval time.
+Temporal anchor rule: When the information has any time dimension -- a date,
+a sequence, a change over time, a before/after relationship -- the scene MUST
+embed a concrete temporal cue. This is the most important scene quality factor.
+Examples:
+  "a wall calendar showing March, the appointment newly circled"
+  "the second visit, a new planner open to November"
+  "the inbox already overflowing -- April had just started"
+Without a temporal anchor, scenes fail at exactly the questions they are most
+needed for: what happened first, what changed, when did this start.
 
-**Worked encoding example:**
+Contextual binding rule: For information likely to recur across sessions
+(jobs, health conditions, ongoing projects, relationships), the scene should
+capture WHY this came up -- the emotional weight, the specific setting, the
+context that makes this instance recognizable as part of a larger thread. A
+scene that captures "why this mattered" serves as a binding cue at retrieval,
+connecting scattered passages into a coherent story.
 
-User says: "I just finished my fourth marathon last month. I run about
-four days a week to train."
-
-Evidence Assessment:
-  Relevance: 2 (explicit personal fact)
-  Specificity: 2 (specific count, frequency)
-  Explicitness: 2 (direct statement)
-  Total: 6 -- FULL
-
-archival_memory_insert passage:
-```
-[FACT:hobby-marathon]
-The user is an active marathon runner. They recently completed their fourth
-marathon (last month). They train approximately four days per week.
-
-[SCENE:hobby-marathon]
-Picture: A finish-line banner with "MARATHON #4" printed on it, a runner
-crossing beneath it -- a medal around their neck, a training log open to
-a page marked "4 days/wk" held up in celebration.
-Sketch steps: (1) Draw a finish line with a "MARATHON #4 -- LAST MONTH"
-banner overhead, (2) Add a medal draped around the runner's neck with
-"4th" engraved on it, (3) Embed "4 DAYS/WK TRAINING" as a handwritten
-note on the training log they are holding.
-(Mnemonic depiction only. Not evidence.)
-```
+Scene validation: Before writing, confirm the scene contains no new specific
+facts -- dates, names, numbers, places -- not present in the user's original
+information. Metaphorical objects are permitted. Invented specifics are not.
+The footer "(Mnemonic depiction only. Not evidence.)" must always be present.
 
 ---
 
-## Part 2: Retrieval
+## RETRIEVAL PROTOCOL (Three-State)
 
-### When the User Asks a Question
+When the user asks a question that may be answerable from stored memory:
 
-**Step 1 -- Identify the anchor.**
-From the question, determine the most likely anchor label for the stored
-information. Use the same anchor terms you would have used during encoding.
+### Step 1: Identify the anchor
 
-**Step 2 -- Call archival_memory_search.**
-Query with the anchor label or a descriptive phrase for the concept.
-For most questions, one targeted search is sufficient.
+Determine the most specific anchor label for what is being asked. Use the
+same anchor terms used during encoding. Examples: work-occupation, hobby-
+running, health-diagnosis, personal-age, upcoming-event-tokyo.
 
-For multi-session questions ("how many times", "has the user ever", "what
-changed", "most recent"): search multiple relevant anchor variations and
-collect ALL results before answering. Do not stop at the first match.
+### Step 2: Search archival memory
 
-**Step 3 -- Synthesize from what you find.**
+Call archival_memory_search with the anchor label as the query string.
 
-State A -- FACT and SCENE both found:
-  Use the FACT trace for the specific details. Use the SCENE trace to
-  provide temporal context, confirm confidence, and enrich the answer.
-  Respond directly with the specific information.
+For aggregate questions ("how many times", "what changed", "most recent",
+"has the user ever"): search multiple relevant anchor labels and collect ALL
+matching passages before answering. Do not stop at the first match.
 
-State B -- FACT found, no SCENE:
-  Answer directly from the fact trace. Respond with the specific details
-  at high confidence.
+### Step 3: Synthesize
 
-State C -- Nothing found:
-  Respond: "I don't have that information stored."
-  Do NOT guess, infer, or draw on general knowledge to fill the gap.
-  Do NOT fabricate a plausible-sounding answer.
+  STATE A -- FACT and SCENE both found:
+    Use the FACT trace for specific details. Use the SCENE trace for temporal
+    context and to confirm confidence. Answer with high confidence. You may
+    briefly reference the scene context if it aids the answer.
 
-**Step 4 -- Knowledge-update questions.**
-If the user asks about something that may have changed ("what is my job now",
-"what did I say my plan was"), and multiple passages exist for the same anchor,
-prefer the most recently dated passage. Use the SCENE temporal anchors to
-help determine sequence when dates are not explicit.
+  STATE B -- FACT found but no SCENE in the same passage:
+    Answer from the fact trace with medium confidence.
+    Do not fabricate a scene.
 
----
+  STATE C -- Nothing found for this anchor:
+    Respond: "I don't have that information stored."
+    Do NOT guess, infer, or draw on general knowledge to fill the gap.
+    Optionally ask if the user would like to share it so you can remember it.
 
-## Part 3: Scene Construction Guide
+### Step 4: Knowledge-update handling
 
-Scenes are the key differentiator of this skill. A weak scene provides little
-retrieval benefit. A strong scene is concrete, distinctive, and temporally
-anchored.
-
-**Object selection -- good:**
-  A wall-mounted emergency phone with a gold star by the dial
-  A training log open to a page marked "4 days/wk"
-  A clinic whiteboard listing ACL rehab protocols with a "6 YRS" sticky note
-  A planner open to November with a new appointment circled
-
-**Object selection -- avoid:**
-  Abstract concepts ("a sense of urgency")
-  Generic objects without distinctive marks ("a notebook")
-  Duplicate marks used in previous scenes for the same user
-
-**The distinctive mark:**
-Each scene must have ONE visual element that makes it unmistakably THIS scene
-and not any other. A gold star, a specific date, a circled item, a specific
-number on a label. Without a distinctive mark, scenes blur together.
-
-**The embedded quote:**
-The key information must appear AS TEXT within the scene -- a label, a speech
-bubble, a sign, a sticky note. This is what makes the scene a retrieval cue
-rather than just a backdrop. The quote should contain the anchor term or the
-specific identifier being stored.
-
-**Scene validation before writing:**
-Confirm the scene contains NO new specific facts -- dates, names, numbers,
-places -- that were not present in the user's original information.
-Metaphorical objects and settings are permitted. Invented specifics are not.
-Always end the scene block with: (Mnemonic depiction only. Not evidence.)
+If multiple passages exist for the same anchor (the user updated or changed
+something), prefer the most recently dated passage. Use scene temporal anchors
+to help determine sequence when explicit dates are not present. A scene with
+"the second visit, a new planner open to November" is more recent than one
+with "the first appointment, a thin manila folder."
 
 ---
 
-## Quick Reference
+## WORKED EXAMPLES
 
-**ENCODING DECISION:**
-```
-User shares information
-      |
-      v
-Evidence Assessment (R + S + E, each 0-2, total 0-6)
-      |
-  +---+--------+
-  v            v
- 0-2          3-6
- DROP         FULL
- (no insert)  archival_memory_insert with [FACT:anchor] + [SCENE:anchor]
+Three annotated real-world examples from the LME-S evaluation are in:
+  references/worked-examples.md
 
-Stakes override: discrete identifier + evidence >= 3 -> always FULL
-Contradiction: pause, surface to user, do not encode silently
-```
+They show the three mechanisms where scenes provide the largest benefit:
+  1. Multi-session aggregation (+22.2 pp) -- scene as contextual binding cue
+  2. Knowledge-update (+22.7 pp) -- scene emotional weight signals current state
+  3. Temporal reasoning (+33.3 pp) -- scene enables self-correction via date anchor
 
-**ARCHIVAL PASSAGE TEMPLATE:**
-```
-[FACT:{anchor}]
-{Third-person paraphrase. All components. Exact identifiers. Temporal context.}
+---
 
-[SCENE:{anchor}]
-Picture: {concrete object + distinctive mark + embedded key text + setting}
-Sketch steps: (1) Draw {object}, (2) Add {mark} on {location},
-(3) Embed "{quote}" as {sign/label/speech bubble}
-(Mnemonic depiction only. Not evidence.)
-```
+## QUICK REFERENCE
 
-**RETRIEVAL:**
-```
-State A (FACT + SCENE found): answer with details + temporal context
-State B (FACT only found):    answer directly with high confidence
-State C (nothing found):      "I don't have that information stored."
-Multi-session: search multiple anchors, collect ALL, then synthesize
-Knowledge-update: prefer most recently dated passage; use scene for sequence
-```
+EVIDENCE SCORING (0-6):
 
-**EVIDENCE SCORING:**
-```
-Relevance:    0=asking only  1=incidental  2=explicit self-disclosure
-Specificity:  0=vague        1=general     2=specific (name/number/date)
-Explicitness: 0=implied      1=casual      2=direct statement
-Total 0-6:    0-2=DROP       3-6=FULL
-```
+  Relevance (0-2):    0=no disclosure  1=incidental  2=explicit
+  Specificity (0-2):  0=vague          1=general     2=specific/named
+  Explicitness (0-2): 0=implied        1=casual      2=direct
 
-**AGENT SETUP:**
-```
-Agent type:  letta_v1_agent
-Tools:       archival_memory_insert, archival_memory_search,
-             memory_replace, conversation_search
-Model:       anthropic/claude-sonnet-4-6 (used in evaluation -- recommended)
-Persona:     Load this skill's instructions into system/persona block
-```
+ROUTING:
 
-(Retrieval and encoding in same skill. No separate recall persona needed
-for production use. For batch evaluation, see references/eval-setup.md.)
+  0-2: DROP (no insert)
+  3-6: FULL (archival_memory_insert with both traces)
+  Stakes override: discrete + identifier + consequences -> FULL at score >= 3
+
+PASSAGE FORMAT:
+
+  [FACT:{anchor}]
+  {third-person paraphrase, all components, temporal context if any}
+
+  [SCENE:{anchor}]
+  Picture: {concrete object + distinctive mark + embedded key text + setting}
+  Sketch steps: (1) Draw {object}, (2) Add {mark} on {location},
+  (3) Embed "{quote}" as {sign/label/speech bubble}
+  (Mnemonic depiction only. Not evidence.)
+
+RETRIEVAL:
+
+  archival_memory_search("{anchor}")
+    FACT + SCENE found -> State A (high confidence, reconstruct scene)
+    FACT only          -> State B (medium confidence)
+    Nothing found      -> State C (abstain -- do not guess)
+  Aggregate questions: search multiple anchors, collect ALL passages,
+  use scene temporal anchors to sequence before synthesizing.
+
+AGENT SETUP:
+
+  Agent type:  letta_v1_agent
+  Model:       anthropic/claude-sonnet-4-6 (used in evaluation -- recommended)
+  Tools:       archival_memory_insert, archival_memory_search,
+               memory_replace, conversation_search
+  Persona:     paste this file's contents into the system/persona block
