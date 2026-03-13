@@ -9,7 +9,7 @@
 **Copy this content exactly:**
 
 ```
-Skills Directory: /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval/.skills
+
 
 Available Skills:
 
@@ -132,7 +132,7 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 1. Set up memory blocks in Letta Cloud Web UI (above)
 2. Connect to cloud agent via Letta Code CLI:
    ```bash
-   cd /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT\ Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval
+   cd /.../testing/letta_eval/Cloud_eval
    
    letta --agent <your-agent-id>
    ```
@@ -168,7 +168,7 @@ The emergency code is CODE-ALPHA7. I remember this from our training session con
 If cloud agent approach is problematic, use local agent:
 
 ```bash
-cd /Users/bstern03/Library/CloudStorage/Box-Box/Letta/PT\ Tutor/drawing_on_memory/ben_notes/testing/letta_eval/Cloud_eval
+cd /Users/..testing/letta_eval/Cloud_eval
 
 letta --new
 ```
