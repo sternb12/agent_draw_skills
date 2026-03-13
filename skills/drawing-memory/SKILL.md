@@ -1,529 +1,350 @@
 ---
-name: drawing-memory
+name: dual-trace-memory
 description: >
-  Multi-representational memory encoding skill inspired by the drawing effect
-  (Fernandes et al., 2018). Encodes information as dual-trace file pairs -- a
-  structured paraphrase (fact file) and a distinctive visual scene description
-  (scene file) -- stored in a git-backed Context Repository. Use when a user
-  shares information they may need recalled later: codes, procedures,
-  definitions, preferences, personal facts. Produces files that support the
-  four-state retrieval protocol in memory/system/retrieval-protocol.md.
+  Dual-trace memory encoding skill inspired by the drawing effect
+  (Fernandes et al., 2018). Encodes user information as paired passages
+  in archival memory -- a structured fact trace tagged [FACT:anchor] and
+  a distinctive visual scene trace tagged [SCENE:anchor]. Empirically
+  validated: +19.7 percentage points overall accuracy versus fact-only
+  encoding on LongMemEval-S (100 questions, 4,575-session distractor
+  haystack, GPT-4o graded). Use when a user shares personal information
+  they may need recalled later.
 ---
 
-# Drawing-Memory Encoding Skill
+# Dual-Trace Memory Skill
 
 ## Research Foundation
 
-This skill is inspired by the drawing effect (Fernandes, Wammes, & Meade, 2018),
-which demonstrated that drawing information produces stronger memory traces than
-writing, visualization, or semantic elaboration. Drawing's benefit comes from
-creating integrated traces that combine multiple representational formats,
-producing distinctive memories that support recollection -- context-rich retrieval
-rather than vague familiarity.
+This skill implements the dual-trace encoding approach, inspired by the
+drawing effect (Fernandes, Wammes, & Meade, 2018), which demonstrated that
+drawing information produces stronger memory traces than writing, visualization,
+or semantic elaboration alone. Drawing creates an integrated memory trace
+combining elaborative processing, motor generation, and pictorial inspection --
+producing distinctive memories that support recollection over familiarity.
 
   Citation: Fernandes, M. A., Wammes, J. D., & Meade, M. E. (2018). The
   surprisingly powerful influence of drawing on memory. Current Directions in
-  Psychological Science, 27(5), 302-308. https://doi.org/10.1177/0963721418755385
+  Psychological Science, 27(5), 302-308.
+  https://doi.org/10.1177/0963721418755385
 
-**What this skill does:** Translates that principle into multi-representational
-elaboration for an AI agent. During encoding, the agent generates both a
-structured paraphrase (preserving compositional accuracy) and a distinctive
-visual scene description (providing a unique retrieval cue). This dual-trace
-approach forces generative translation across representational formats -- verbal
-to pictorial -- which creates more retrievable memory files.
+**What this skill does:** Translates the dual-representation principle into
+archival memory encoding. For each piece of qualifying user information, the
+agent generates two traces stored together in a single archival passage:
 
-**What this skill does not do:** Replicate the motor component of drawing.
-Physical hand movements engaging motor cortex have no analog in text generation.
-The benefit here comes from representational translation and elaborative
-processing, not from motor encoding. The skill also does not produce visual
-images -- scene descriptions are text-based depictions that serve as distinctive
-verbal cues, not pictures.
+  [FACT:anchor] -- a structured paraphrase preserving all components of the
+  information in third person. Optimized for compositional accuracy.
 
-**Supported mechanism:** Recollection over familiarity. The retrieval protocol
-(memory/system/retrieval-protocol.md, always loaded) uses scene reconstruction
-to distinguish high-confidence recall from pattern-matching. Items encoded with
-scenes support State A (high confidence) retrieval. Items without scenes default
-to State C (reduced confidence). This mirrors the paper's finding that drawing
-specifically boosted "remember" responses, not "know" responses.
+  [SCENE:anchor] -- a distinctive visual scene embedding the information as
+  a concrete image with temporal anchors. Optimized for recollection and
+  temporal sequencing.
 
-**Empirical validation:** This dual-trace approach was evaluated at scale on
-LongMemEval-S (LME-S), a standardized benchmark of 4,575 real user conversation
-sessions and 100 structured recall questions. A controlled experiment compared
-C6 (dual-trace: fact + scene files) against C7 (fact-only, identical coverage
-and format). Results:
+The fact trace ensures nothing is lost. The scene trace provides a unique
+retrieval cue that enables the agent to distinguish this item from similar
+ones, sequence it in time, and recognize when it has changed.
 
-  Overall accuracy:       +19.7 percentage points (C6 vs C7)
-  Temporal reasoning:     +33.3 pp -- scene anchors enable temporal sequencing
-  Knowledge-update:       +22.7 pp -- scene weight signals which state is current
-  Multi-session:          +22.2 pp -- scenes bind scattered passages into threads
-  Single-session:          0 pp  -- null result (mechanistically meaningful:
-                                   scenes don't help when one passage suffices)
+**What this skill does not do:** Replicate the motor component of physical
+drawing. The benefit here comes from representational translation -- forcing
+the agent to re-encode the same information in a different format -- and from
+the distinctiveness that visual scene descriptions provide as retrieval cues.
 
-  The single-session null result is the mechanistic fingerprint of the effect.
-  Scenes contribute specifically when memory must be aggregated, sequenced, or
-  resolved across multiple entries -- not when a single lookup suffices. This
-  matches exactly what episodic encoding theory predicts.
+**Empirical validation (LongMemEval-S, March 2026):**
 
-  See references/worked-examples.md for three annotated real-world examples
-  from the LME-S evaluation showing each mechanism in action.
+Controlled comparison: C6 (dual-trace) vs C7 (fact-only), identical evidence
+rate (~63-65%), identical format quality, only variable is presence/absence
+of scene traces. 4,575 teach sessions, 100 recall questions, GPT-4o graded.
 
-## When to Use
+  Overall accuracy:       C6 73.7%  vs  C7 54.0%  = +19.7 pp
+  Single-session:         C6 79.2%  vs  C7 79.2%  =   0 pp  (null -- expected)
+  Multi-session:          C6 65.5%  vs  C7 43.3%  = +22.2 pp
+  Knowledge-update:       C6 81.8%  vs  C7 59.1%  = +22.7 pp
+  Temporal-reasoning:     C6 70.8%  vs  C7 37.5%  = +33.3 pp
+  Abstention:             C6 80.0%  vs  C7 82.0%  =  -2 pp
 
-Activate this skill when a user shares information they may need recalled later:
-- Codes, passwords, access credentials
-- Procedures, protocols, step-by-step instructions
-- Definitions, terminology, domain-specific concepts
-- Personal facts, preferences, event details
-- Any information the user explicitly asks you to remember
+The single-session null result is mechanistically meaningful: scenes contribute
+specifically when memory must be aggregated across sessions, sequenced in time,
+or resolved when conflicting entries exist. When a single lookup suffices,
+fact and scene agents perform identically. This matches episodic encoding
+theory exactly.
 
-Do not use for: general conversation, general world knowledge, transient details
-the user won't need again, or information already stored in facts/ -- check for
-duplicates before encoding.
+See references/worked-examples.md for three annotated real-world examples
+from the LME-S evaluation showing each mechanism in action.
 
-## Encoding Workflow
+## When to Use This Skill
 
-### Evidence Assessment
+Encode when a user explicitly shares personal information they may need
+recalled later:
+- Personal facts: name, age, occupation, location, relationships
+- Events: appointments, milestones, trips, significant moments
+- Preferences: hobbies, habits, likes/dislikes with specific detail
+- Credentials or codes: any discrete item with a specific identifier
+- Changes or updates: when the user reports something has changed
 
-Score each piece of information 0-12 before beginning the encoding steps:
+Do NOT encode:
+- General knowledge or information the user is asking about (not sharing)
+- Vague, ambiguous, or contradictory information (surface conflict first)
+- Transient details with no future retrieval value
+- Information already stored -- check for duplicates before encoding
 
-| Category | 0 points | 1 point | 2 points | 3 points |
-|----------|----------|---------|----------|----------|
-| Source reliability | Unknown | Inferred | Stated by user | Confirmed by user |
-| Specificity | Vague | Partial detail | Specific | Precise with identifier |
-| Repetition | First mention | Mentioned twice | Referenced multiple times | Core/recurring topic |
-| Consistency | Contradicts stored info | No context to check | Consistent with stored info | Reinforces stored info |
+---
+
+## Part 1: Encoding
+
+### Step 1 -- Evidence Assessment
+
+Score each piece of information on three dimensions before encoding:
+
+  Relevance (0-2):
+    0 = user is only asking questions; no self-disclosure at all
+    1 = user incidentally reveals personal context while asking
+    2 = user explicitly states a personal fact, preference, event, or detail
+  CRITICAL: Score 0 if the user asks about a topic but does not state personal
+  involvement. "Can you explain seafood nutrition?" scores 0. "I've been trying
+  to eat more seafood" scores 2.
+
+  Specificity (0-2):
+    0 = vague or general ("I like to exercise")
+    1 = general statement with some context ("I run a few times a week")
+    2 = specific: includes a name, number, date, event, or named preference
+
+  Explicitness (0-2):
+    0 = implied or inferred from context
+    1 = casual mention in passing
+    2 = direct statement by the user
+
+  Total = Relevance + Specificity + Explicitness (0-6)
 
 **Routing:**
-- 0-4: DROP -- do not encode
-- 5-7: STREAMLINED -- fact file only, no scene (see Streamlined Path below)
-- 8-12: FULL -- both fact and scene files
+  0-2: DROP. Do not encode. Respond: "No personal user information to store."
+       Do NOT call archival_memory_insert.
+  3-6: FULL. Encode with both FACT and SCENE traces (see Step 2 below).
 
-**Coverage calibration note:** Empirical evaluation showed that encoding ~65%
-of sessions outperforms encoding ~22% (even with a cleaner format). When in
-doubt between DROP and STREAMLINED, prefer STREAMLINED. When in doubt between
-STREAMLINED and FULL, prefer FULL for any information with a temporal or
-relational dimension. Missed encodings cannot be recovered; over-encoding
-is correctable.
+**Stakes override:** If the user states a specific code, credential, exact
+number, named event, or safety-critical item AND the evidence score is 3 or
+above, treat as FULL regardless of whether the score would otherwise be
+borderline.
 
-**Stakes override:** For high-stakes discrete items (codes, credentials, safety
-procedures): if evidence score is 5 or above, default to FULL regardless of
-standard STREAMLINED routing. If evidence score is below 5, ask the user for
-confirmation before encoding; if confirmed, encode FULL.
+**Contradiction check:** Before encoding, mentally compare the new information
+against what you may already have stored for this user. If the new information
+contradicts existing information, DO NOT encode silently. Surface the conflict
+to the user and ask for clarification before proceeding.
 
-**Exception:** If the information contradicts an existing facts/ file, pause
-encoding. Surface the conflict to the user before proceeding. Do not encode
-conflicting information silently.
-
-### Step 1: Classify Information Type
-
-Before encoding, classify the information:
-- **Discrete** -- single items with clear identifiers (codes, names, dates)
-- **Compositional** -- multi-part concepts or definitions with several components
-- **Relational** -- procedures, causal chains, sequences with dependencies
-
-Record the type in frontmatter. The retrieval protocol adjusts behavior based
-on this classification.
-
-### Step 2: Generate the Fact File
-
-Create `facts/{anchor-term}.md` with structured frontmatter and a paraphrase of
-the information.
-
-**File naming:** Use the anchor term as the filename -- lowercase, hyphens for
-spaces. Examples: `facts/code-oscar7.md`, `facts/session-token-validation.md`,
-`facts/triage-procedure.md`. The fact file and scene file for the same item
-share the same base name. This makes bidirectional linking deterministic and
-the git log scannable.
-
-**First-use:** If `facts/` or `scenes/` do not exist in the memory repository,
-create them before writing the first file:
-```bash
-mkdir -p facts/ scenes/
-```
-
-**Before writing:** Search facts/ for an existing file on this topic. If one
-exists, compare content. If the new information contradicts the stored content,
-stop and surface the conflict to the user -- do not write. This mirrors the
-contradiction pause condition in Evidence Assessment.
-
-**Frontmatter requirements:**
-```yaml
 ---
-description: [Searchable summary with anchor term -- must contain the specific
-  identifier, defined term, or unique name that makes this file findable]
-type: [discrete | compositional | relational]
-linked_scene: scenes/{anchor-term}.md
-confidence: [HIGH | MEDIUM | LOW]
-evidence_score: [0-12]
-stored: [YYYY-MM-DD]
----
+
+### Step 2 -- FULL Encoding (score 3-6)
+
+For FULL encoding, call archival_memory_insert ONCE with a passage containing
+both the FACT trace and the SCENE trace for the same anchor.
+
+**Anchor naming:** Choose a short, descriptive lowercase label using hyphens.
+The anchor identifies the concept, not the session. Use consistent anchors
+across sessions for the same topic so future searches find all related entries.
+
+  Examples: work-occupation, hobby-running, pet-name, health-condition,
+  upcoming-trip-tokyo, medication-name, emergency-code-alpha7
+
+**Passage format:**
+
 ```
+[FACT:{anchor}]
+{Structured paraphrase of the information in third person. Preserve all
+components. For discrete items: include the exact identifier. For
+multi-part items: list each component explicitly. Include any temporal
+context the user provided (dates, sequence, before/after).}
 
-**Content requirements:**
-- Paraphrase the information in your own words -- do not copy verbatim
-- For discrete items: state the item clearly with its identifier
-- For compositional items: preserve ALL components. Before writing the file,
-  list each component of the definition explicitly (e.g., "This definition
-  has 3 parts: X, Y, Z"). Confirm all components appear in the paraphrase.
-  If any are missing, revise before writing.
-- For relational items: preserve sequence order and dependency relationships
-
-**Anchor term rule:** The frontmatter description MUST contain the most specific
-identifier for this information. For codes: include the code itself. For defined
-terms: include the term. For procedures: include the procedure name. This is
-what makes frontmatter search unambiguous.
-
-### Step 3: Generate the Scene File
-
-Create `scenes/{anchor-term}.md` -- same base name as the fact file -- with a
-distinctive visual scene and three sketch steps.
-
-**Frontmatter requirements:**
-```yaml
----
-description: Scene cue for [anchor term] -- [brief topic context]
-type: scene
-linked_fact: facts/{anchor-term}.md
-confidence: [HIGH | MEDIUM | LOW]
-stored: [YYYY-MM-DD]
----
-```
-
-**Content format:**
-```
-Picture: [One-sentence scene description -- a concrete object with a distinctive
-visual mark, placed in a specific setting. Embed the key information as a
-quote, label, or speech bubble within the scene.]
-
-Sketch steps: (1) Draw [object in specific setting], (2) Add [distinctive mark]
-on [location], (3) Embed "[key quote]" as [sign/label/speech bubble]
-
+[SCENE:{anchor}]
+Picture: {One concrete object in a specific setting with a distinctive
+visual mark. Embed the key information as a visible label, sign, or
+speech bubble within the scene.}
+Sketch steps: (1) Draw {object in setting}, (2) Add {distinctive mark}
+on {location}, (3) Embed "{key quote}" as {sign/label/speech bubble}
 (Mnemonic depiction only. Not evidence.)
 ```
 
 **Scene quality rules:**
-- The object should be concrete and visually specific (not abstract)
-- The distinctive mark must be unique to THIS scene -- avoid generic details
-- The key information must appear explicitly in the scene (as text on a sign,
-  words in a speech bubble, a label on the object)
-- Anchor term from the fact file must appear somewhere in the scene
-- Three sketch steps maximum, written as actions (verbs), not labels (nouns)
-- Choose physical objects: tools, containers, instruments, architectural
-  features -- not abstractions
+- The object must be concrete and visually specific (not abstract)
+- The distinctive mark must be unique to THIS scene
+- The key information must appear explicitly as text within the scene
+- The anchor term should appear somewhere in the scene description
 
-**Temporal anchor rule (critical):** When the information has any time dimension
--- a date, a sequence, a before/after relationship, a change over time -- the
+**Temporal anchor rule (critical for retrieval):** When the information has
+any time dimension -- a date, a sequence, a before/after, a change -- the
 scene MUST embed a concrete temporal cue. This is the single most important
-scene quality factor for retrieval. Examples:
-- "a rainy Sunday afternoon, the dining table cleared for the first session"
-- "the second visit, a new planner open to November" (signals a change)
-- "the wall calendar showing April, the inbox already overflowing"
-Without a temporal anchor, scenes fail at exactly the questions they're most
-needed for: what happened first, what changed, when did this start.
+scene quality factor. Examples of good temporal anchors:
+  "a wall calendar showing November, the planner newly opened"
+  "the second visit, a new notebook labeled Week 2 on the desk"
+  "a rainy Sunday afternoon, the first time this came up"
+Without a temporal anchor, scenes fail at exactly the questions they are
+most needed for: what happened first, what changed, when did this start.
 
-**Contextual binding rule:** For information that will need to be aggregated
-across multiple sessions (recurring topics, patterns, counts), the scene should
-capture WHY this came up -- the emotional weight, the setting, the context that
-makes this instance recognizable as part of a larger thread. A scene that
-captures "why this mattered" serves as a binding cue that connects scattered
-fact entries into a coherent story at retrieval time.
+**Contextual binding rule (critical for multi-session):** For information
+likely to recur across sessions -- recurring topics, patterns, counts --
+the scene should capture WHY this came up: the emotional weight, the
+setting, the context that makes this instance part of a larger thread.
+A scene that captures "why this mattered" connects scattered fact entries
+into a coherent story at retrieval time.
 
-**Scene validation:** Before writing, confirm the scene contains no new specific
-facts -- dates, names, numbers, or places -- not present in the user's original
-information. Metaphorical objects are permitted. Invented specifics are not.
+**Worked encoding example:**
 
-### Step 4: Commit
+User says: "I just finished my fourth marathon last month. I run about
+four days a week to train."
 
-Write both files. Use a git commit message that records what was stored,
-evidence score, and information type:
+Evidence Assessment:
+  Relevance: 2 (explicit personal fact)
+  Specificity: 2 (specific count, frequency)
+  Explicitness: 2 (direct statement)
+  Total: 6 -- FULL
+
+archival_memory_insert passage:
 ```
-mem: store {anchor-term} ({type}, evidence:{score})
-```
+[FACT:hobby-marathon]
+The user is an active marathon runner. They recently completed their fourth
+marathon (last month). They train approximately four days per week.
 
-### Streamlined Path (Medium-Confidence Items)
-
-For items routing to STREAMLINED (evidence score 5-7) where full encoding is
-disproportionate:
-- Write the fact file with full frontmatter
-- Omit the `linked_scene` field entirely -- do not set to "none"
-- Skip the scene file
-- These items will retrieve at State C (reduced confidence) per the
-  retrieval protocol
-- A sleep-time consolidation pass may add scenes to these items later
-
-```yaml
-# Streamlined path frontmatter example
----
-description: Session token three-factor validation -- device fingerprint,
-  90-minute duration, IP-change revocation
-type: compositional
-confidence: MEDIUM
-evidence_score: 5
-stored: 2026-02-21
-# linked_scene omitted -- streamlined path, no scene file exists
----
-```
-
-If the user later confirms or repeats streamlined-path information, re-score
-and consider upgrading to full encoding with a scene file.
-
-## Worked Examples
-
-### Example 1: Discrete Item -- Full Encoding Path
-
-**User says:** "The emergency access code for the crisis protocol is CODE-OSCAR7.
-We learned it in the December training session."
-
-**Duplicate check:** Search facts/ -- no existing file on this topic. Proceed.
-
-**Evidence Assessment:**
-- Source reliability: Stated by user (2)
-- Specificity: Precise with identifier (3)
-- Repetition: First mention (0)
-- Consistency: No context to check (1)
-- **Total: 6** -> Routes to STREAMLINED
-
-**Applying stakes override:** This is a discrete item with a specific identifier
-(access code) where retrieval failure has real-world consequences. Evidence score
-is 5 or above, so default to FULL regardless of standard STREAMLINED routing.
-
-**Step 1 -- Classify:** Discrete (single item with clear identifier)
-
-**Step 2 -- Generate fact file:** `facts/code-oscar7.md`
-
-```yaml
----
-description: Emergency access code CODE-OSCAR7 from December crisis protocol
-  training session
-type: discrete
-linked_scene: scenes/code-oscar7.md
-confidence: MEDIUM
-evidence_score: 6
-stored: 2026-02-21
----
-```
-
-The emergency access code for the crisis protocol is CODE-OSCAR7. This was
-taught during the December training session.
-
-**Step 3 -- Generate scene file:** `scenes/code-oscar7.md`
-
-```yaml
----
-description: Scene cue for CODE-OSCAR7 -- emergency crisis protocol, December
-  training
-type: scene
-linked_fact: facts/code-oscar7.md
-confidence: MEDIUM
-stored: 2026-02-21
----
-```
-
-Picture: A red wall-mounted emergency phone with a gold star beside the dial,
-a hand reaching for the receiver urgently. A speech bubble from the phone
-reads "CODE-OSCAR7."
-
-Sketch steps: (1) Draw a red wall-mounted emergency phone in a hospital
-corridor, (2) Add a gold star emblem beside the rotary dial, (3) Embed
-"CODE-OSCAR7" in a speech bubble rising from the receiver.
-
+[SCENE:hobby-marathon]
+Picture: A finish-line banner with "MARATHON #4" printed on it, a runner
+crossing beneath it -- a medal around their neck, a training log open to
+a page marked "4 days/wk" held up in celebration.
+Sketch steps: (1) Draw a finish line with a "MARATHON #4 -- LAST MONTH"
+banner overhead, (2) Add a medal draped around the runner's neck with
+"4th" engraved on it, (3) Embed "4 DAYS/WK TRAINING" as a handwritten
+note on the training log they are holding.
 (Mnemonic depiction only. Not evidence.)
-
-**Step 4 -- Commit:**
-`mem: store code-oscar7 (discrete, evidence:6, full path -- stakes override)`
-
----
-
-### Example 2: Compositional Item -- Streamlined Encoding Path
-
-**User says:** "Session tokens use three-factor validation: the authentication
-mechanism checks the user's device fingerprint, sessions last 90 minutes
-maximum, and tokens are revoked immediately if the user's IP address changes."
-
-**Duplicate check:** Search facts/ -- no existing file on session tokens. Proceed.
-
-**Evidence Assessment:**
-- Source reliability: Stated by user (2)
-- Specificity: Specific (2)
-- Repetition: First mention (0)
-- Consistency: No context to check (1)
-- **Total: 5** -> Routes to STREAMLINED
-
-Score is 5 -- streamlined path is appropriate. This is a first-mention technical
-definition without confirmation. Not a high-stakes item requiring override.
-
-**Step 1 -- Classify:** Compositional (multi-part definition with three components)
-
-**Step 2 -- Component listing (compositional verification):**
-This definition has 3 parts:
-1. Authentication mechanism: device fingerprint check
-2. Session duration: 90 minutes maximum
-3. Revocation condition: IP address change triggers immediate revocation
-
-All three must appear in the paraphrase.
-
-**Generate fact file:** `facts/session-token-validation.md`
-
-```yaml
----
-description: Session token three-factor validation -- device fingerprint,
-  90-minute duration, IP-change revocation
-type: compositional
-confidence: MEDIUM
-evidence_score: 5
-stored: 2026-02-21
-# linked_scene omitted -- streamlined path, no scene file exists
----
 ```
 
-Session tokens use three-factor validation. First, the authentication mechanism
-verifies the user's device fingerprint. Second, each session has a maximum
-duration of 90 minutes. Third, tokens are revoked immediately if the user's IP
-address changes during the session.
+---
 
-Checking paraphrase against component list:
-- Device fingerprint check [x]
-- 90-minute maximum [x]
-- IP-change revocation [x]
+## Part 2: Retrieval
 
-All three components preserved.
+### When the User Asks a Question
 
-**Step 3 -- Commit:**
-`mem: store session-token-validation (compositional, evidence:5, streamlined)`
+**Step 1 -- Identify the anchor.**
+From the question, determine the most likely anchor label for the stored
+information. Use the same anchor terms you would have used during encoding.
 
-No scene file generated. This item will retrieve at State C (reduced confidence)
-per the retrieval protocol. If the user confirms or repeats this information,
-re-score and consider upgrading to full encoding with a scene file.
+**Step 2 -- Call archival_memory_search.**
+Query with the anchor label or a descriptive phrase for the concept.
+For most questions, one targeted search is sufficient.
 
-## Troubleshooting
+For multi-session questions ("how many times", "has the user ever", "what
+changed", "most recent"): search multiple relevant anchor variations and
+collect ALL results before answering. Do not stop at the first match.
 
-**Scene file and fact file have different base names**
-Bidirectional linking depends on shared filenames. If `facts/code-oscar7.md`
-links to `scenes/emergency-code.md`, the retrieval protocol may fail to find
-the corresponding file. Fix: rename the scene file to match the fact file's
-base name and update both `linked_scene` and `linked_fact` fields.
+**Step 3 -- Synthesize from what you find.**
 
-**Frontmatter description too vague to surface in search**
-If the agent can't find a file by scanning frontmatter, the description lacks
-specificity. Every description must contain the anchor term -- the specific
-identifier that makes it findable. "Emergency code information" is too vague.
-"Emergency access code CODE-OSCAR7 from December training" is findable.
+State A -- FACT and SCENE both found:
+  Use the FACT trace for the specific details. Use the SCENE trace to
+  provide temporal context, confirm confidence, and enrich the answer.
+  Respond directly with the specific information.
 
-**Compositional paraphrase missing components**
-If retrieval returns an incomplete answer for a multi-part definition, the
-encoding step likely skipped the component listing check. Re-encode: list all
-components explicitly, confirm each appears in the paraphrase, then rewrite
-the fact file.
+State B -- FACT found, no SCENE:
+  Answer directly from the fact trace. Respond with the specific details
+  at high confidence.
 
-**Contradiction discovered at write time**
-If the new information conflicts with an existing fact file, do not overwrite.
-Surface both versions to the user. Once the user confirms which is correct,
-update the fact file and record the correction in the commit message:
-`mem: update {anchor-term} (user-confirmed correction, evidence:{new-score})`
+State C -- Nothing found:
+  Respond: "I don't have that information stored."
+  Do NOT guess, infer, or draw on general knowledge to fill the gap.
+  Do NOT fabricate a plausible-sounding answer.
 
-**Scene contains invented specifics**
-If a scene file includes dates, numbers, names, or places not present in the
-user's original information, the scene validation check was skipped. Rewrite
-the scene using only metaphorical objects and details from the original.
-The footer "(Mnemonic depiction only. Not evidence.)" must be present.
+**Step 4 -- Knowledge-update questions.**
+If the user asks about something that may have changed ("what is my job now",
+"what did I say my plan was"), and multiple passages exist for the same anchor,
+prefer the most recently dated passage. Use the SCENE temporal anchors to
+help determine sequence when dates are not explicit.
 
-**Streamlined item needs upgrading to full path**
-When a user confirms or repeats information that was previously stored via
-the streamlined path, re-score the evidence. If it now routes to FULL (or
-stakes override applies), generate a scene file with the same base name,
-add the `linked_scene` field to the existing fact file's frontmatter, and
-commit: `mem: upgrade {anchor-term} (added scene, evidence:{new-score})`
+---
+
+## Part 3: Scene Construction Guide
+
+Scenes are the key differentiator of this skill. A weak scene provides little
+retrieval benefit. A strong scene is concrete, distinctive, and temporally
+anchored.
+
+**Object selection -- good:**
+  A wall-mounted emergency phone with a gold star by the dial
+  A training log open to a page marked "4 days/wk"
+  A clinic whiteboard listing ACL rehab protocols with a "6 YRS" sticky note
+  A planner open to November with a new appointment circled
+
+**Object selection -- avoid:**
+  Abstract concepts ("a sense of urgency")
+  Generic objects without distinctive marks ("a notebook")
+  Duplicate marks used in previous scenes for the same user
+
+**The distinctive mark:**
+Each scene must have ONE visual element that makes it unmistakably THIS scene
+and not any other. A gold star, a specific date, a circled item, a specific
+number on a label. Without a distinctive mark, scenes blur together.
+
+**The embedded quote:**
+The key information must appear AS TEXT within the scene -- a label, a speech
+bubble, a sign, a sticky note. This is what makes the scene a retrieval cue
+rather than just a backdrop. The quote should contain the anchor term or the
+specific identifier being stored.
+
+**Scene validation before writing:**
+Confirm the scene contains NO new specific facts -- dates, names, numbers,
+places -- that were not present in the user's original information.
+Metaphorical objects and settings are permitted. Invented specifics are not.
+Always end the scene block with: (Mnemonic depiction only. Not evidence.)
+
+---
 
 ## Quick Reference
 
+**ENCODING DECISION:**
 ```
-ENCODING DECISION FLOW:
-  User shares information
-        |
-        v
-  Check facts/ for duplicates -- duplicate found? -- compare & resolve
-        |
-        v (no duplicate)
-  Evidence Assessment (0-12)
-        |
-   +----+------------+
-   v    v            v
-  0-4  5-7          8-12
-  DROP  STREAMLINED  FULL
-  (don't |            |
-  encode)|       +----+
-         v       v    v
-       Classify  Classify
-         |       |
-         v       v
-       Fact    Fact + Scene
-       file    files
-         |       |
-         v       v
-       Commit  Commit
+User shares information
+      |
+      v
+Evidence Assessment (R + S + E, each 0-2, total 0-6)
+      |
+  +---+--------+
+  v            v
+ 0-2          3-6
+ DROP         FULL
+ (no insert)  archival_memory_insert with [FACT:anchor] + [SCENE:anchor]
 
-  * Stakes override: discrete + identifier + consequences -> FULL
-  * Contradiction: pause, surface to user, do not encode silently
+Stakes override: discrete identifier + evidence >= 3 -> always FULL
+Contradiction: pause, surface to user, do not encode silently
 ```
 
+**ARCHIVAL PASSAGE TEMPLATE:**
 ```
-FILE STRUCTURE:
-  memory/
-  +-- system/
-  |   +-- retrieval-protocol.md     <- always loaded
-  +-- facts/
-  |   +-- {anchor-term}.md          <- paraphrase + frontmatter
-  +-- scenes/
-  |   +-- {anchor-term}.md          <- scene + 3 sketch steps + frontmatter
-  +-- (index generated by sleep-time agent if needed)
+[FACT:{anchor}]
+{Third-person paraphrase. All components. Exact identifiers. Temporal context.}
 
-  # Drawing-memory files only; other system/ files not shown
+[SCENE:{anchor}]
+Picture: {concrete object + distinctive mark + embedded key text + setting}
+Sketch steps: (1) Draw {object}, (2) Add {mark} on {location},
+(3) Embed "{quote}" as {sign/label/speech bubble}
+(Mnemonic depiction only. Not evidence.)
 ```
 
+**RETRIEVAL:**
 ```
-FRONTMATTER TEMPLATE (fact file):
-  ---
-  description: [summary with ANCHOR TERM]
-  type: [discrete | compositional | relational]
-  linked_scene: scenes/{anchor-term}.md    # omit for streamlined
-  confidence: [HIGH | MEDIUM | LOW]
-  evidence_score: [0-12]
-  stored: [YYYY-MM-DD]
-  ---
-
-FRONTMATTER TEMPLATE (scene file):
-  ---
-  description: Scene cue for [ANCHOR TERM] -- [topic]
-  type: scene
-  linked_fact: facts/{anchor-term}.md
-  confidence: [HIGH | MEDIUM | LOW]
-  stored: [YYYY-MM-DD]
-  ---
+State A (FACT + SCENE found): answer with details + temporal context
+State B (FACT only found):    answer directly with high confidence
+State C (nothing found):      "I don't have that information stored."
+Multi-session: search multiple anchors, collect ALL, then synthesize
+Knowledge-update: prefer most recently dated passage; use scene for sequence
 ```
 
+**EVIDENCE SCORING:**
 ```
-SCENE FORMAT:
-  Picture: [concrete object + distinctive mark + embedded key info]
-  Sketch steps: (1) Draw [object], (2) Add [mark] on [location],
-  (3) Embed "[quote]" as [sign/label/speech bubble]
-  (Mnemonic depiction only. Not evidence.)
-```
-
-```
-COMMIT MESSAGE FORMAT:
-  mem: store {anchor-term} ({type}, evidence:{score})
-  mem: store {anchor-term} ({type}, evidence:{score}, full path -- stakes override)
-  mem: store {anchor-term} ({type}, evidence:{score}, streamlined)
-  mem: update {anchor-term} (user-confirmed correction, evidence:{score})
-  mem: upgrade {anchor-term} (added scene, evidence:{score})
+Relevance:    0=asking only  1=incidental  2=explicit self-disclosure
+Specificity:  0=vague        1=general     2=specific (name/number/date)
+Explicitness: 0=implied      1=casual      2=direct statement
+Total 0-6:    0-2=DROP       3-6=FULL
 ```
 
-**Multi-session retrieval rule:** For aggregate questions ("how many times,"
-"most often," "has the user ever," "what changed"), do NOT stop at the first
-match. Scan ALL files with the relevant anchor across the facts/ directory.
-The file system makes complete enumeration possible -- use it. Collect all
-entries, then synthesize. The scene files for each entry will provide temporal
-anchors to help sequence and compare across instances.
+**AGENT SETUP:**
+```
+Agent type:  letta_v1_agent
+Tools:       archival_memory_insert, archival_memory_search,
+             memory_replace, conversation_search
+Model:       anthropic/claude-sonnet-4-6 (or equivalent)
+Persona:     Load this skill's instructions into system/persona block
+```
 
-(Encoding skill only. For retrieval instructions, see
-memory/system/retrieval-protocol.md.)
+(Retrieval and encoding in same skill. No separate recall persona needed
+for production use. For batch evaluation, see references/eval-setup.md.)

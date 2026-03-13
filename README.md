@@ -1,317 +1,229 @@
-# Agent Drawing Memory Skill
+# Dual-Trace Memory Skill for Letta Agents
 
-**Research-backed memory enhancement for AI agents using the "drawing effect"**
-
-[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Compatible-blue)](https://agentskills.io/)
-[![Letta](https://img.shields.io/badge/Letta-Supported-green)](https://letta.com/)
-
-## Overview
-
-This skill implements the **drawing effect** from cognitive science research, enabling AI agents to create richer, more retrievable memory traces. Unlike traditional memory storage, this approach translates the three-component drawing effect (elaborative processing, motor generation, pictorial inspection) into text-based workflows that AI agents can execute.
-
-## Research Foundation
-
-### The Drawing Effect (Fernandes et al., 2018)
-
-The **Impact of Drawing on Memory** research demonstrates that drawing information produces significantly better recall than:
-- Writing text descriptions
-- Visualization alone
-- Viewing pictures
-- Simply reading
-
-**Why Drawing Works:**
-
-Drawing creates an **integrated memory trace** with three critical components:
-
-1. **Elaborative/Semantic Processing**
-   - Understanding and transforming information
-   - Creating connections and relationships
-   - Active interpretation vs. passive reception
-
-2. **Motor Component** *
-   - Physical act of creating (doing, not just reading)
-   - Generative process engages deeper processing
-   - *Critical insight*: The benefit requires YOU doing the work
-
-3. **Pictorial Inspection**
-   - Visual checking and verification
-   - Spatial/visual encoding alongside verbal
-   - Distinctiveness through visualization
-
-**Key Research Findings:**
-- Drawing improves **recollection** (context-rich memory), not just familiarity
-- The benefit shows at **retrieval**, not just encoding
-- **Context reinstatement** (reconstructing the scene) aids recall
-- Motor execution is essential (auto-generated content doesn't work)
-- Varied metaphors increase distinctiveness
-
-### Translation to AI Agents
-
-Since AI agents cannot physically draw, we translate each component:
-
-| Human Process | AI Agent Translation |
-|---------------|---------------------|
-| Understanding content | Paraphrasing facts to 3rd person |
-| Drawing (motor) | **Generating own sketch steps** (not reading templates) |
-| Visual inspection | Creating scene descriptions with metaphors |
-| Retrieval context | **Reconstructing scenes before answering** |
-
-**The Critical Difference**: The agent must **actively generate** content (sketch steps, scene text), not just call a function that does it automatically. This preserves the motor component that makes drawing effective.
-
-## Why Skills Instead of Tools?
-
-Traditional Letta tools are **passive** - the agent calls a function and receives results. This approach makes the agent **active**:
-
-- **Agent generates sketch steps** (motor component)
-- **Agent reconstructs scenes at retrieval** (context reinstatement)
-- **Flexible guidelines** instead of rigid schemas
-- **Progressive disclosure** (loads only when needed)
-
-This active participation is what makes the drawing effect work!
-
-## Installation
-
-### Prerequisites
-- Letta Code CLI (0.7.2+)
-- Git
-
-### Setup
-
-1. **Clone this repository**:
-   ```bash
-   git clone https://github.com/sternb12/agent_draw_skills.git
-   cd agent_draw_skills
-   ```
-
-2. **Note the skills path**:
-   ```bash
-   pwd
-   # Example: /Users/yourname/agent_draw_skills
-   ```
-
-3. **Configure your Letta agent** (via Web UI or CLI):
-
-   **Option A - Cloud Agent (Web UI + CLI):**
-   - Go to https://app.letta.com
-   - Create or select agent
-   - Add memory block: `skills` (read-only)
-     - Content: See [docs/CLOUD_AGENT_SKILLS_SETUP.md](docs/CLOUD_AGENT_SKILLS_SETUP.md)
-   - Add memory block: `loaded_skills` (read-only, initially empty)
-   - Verify Skill tool is attached
-   - Connect via CLI: `letta --agent <agent-id>`
-
-   **Option B - Local Agent (CLI only):**
-   - Navigate to repository directory
-   - Run: `letta --new`
-   - Skills auto-discovered from `skills/` directory
-
-## Usage
-
-### Basic Workflow
-
-**1. Store Information**
-```
-User: "Remember that CODE-ALPHA7 is the emergency code from training"
-
-Agent:
-  -> Loads drawing-memory skill
-  -> Extracts evidence from conversation
-  -> Scores evidence (0-10 scale)
-  -> Paraphrases to 3rd person
-  -> Generates own sketch steps (motor component)
-  -> Creates scene with metaphor + distinctive mark
-  -> Stores [FACT] + [SCENE] in memory
-  -> Unloads skill
-```
-
-**2. Retrieve Information**
-```
-User: "What was that emergency code?"
-
-Agent:
-  -> Searches memory for FACT + SCENE
-  -> Reconstructs scene mentally (retrieval component)
-  -> Answers with context-rich response
-  
-Response: "The emergency code is CODE-ALPHA7. I remember creating
-a sketch of a red emergency phone with a gold star marking it..."
-```
-
-### What Makes This Work
-
-**Motor Component**: Agent generates its own sketch steps
-```
-[x] GOOD (Agent generates):
-   1) Draw red emergency phone on wall
-   2) Add gold star by dial
-   3) Person reaching urgently
-   4) Speech bubble: "CODE-ALPHA7"
-   5) Label "Emergency Code"
-
-[ ] BAD (Auto-generated):
-   Agent doesn't do the generative work - no motor component
-```
-
-**Retrieval Component**: Agent reconstructs scene before answering
-```
-[x] GOOD:
-   "I remember the red phone with gold star... CODE-ALPHA7"
-   
-[ ] BAD:
-   "CODE-ALPHA7" (no scene reconstruction)
-```
-
-## Skill Components
-
-```
-skills/drawing-memory/
-+-- SKILL.md (777 lines)
-|   +-- 9-step encoding workflow
-|   +-- Retrieval workflow with scene reconstruction
-|   +-- Evidence scoring (0-10 scale)
-|   +-- Metaphor catalog (50+ options)
-|   +-- Troubleshooting guide
-|
-+-- README.md
-|   +-- Skill overview
-|
-+-- examples/
-|   +-- edge-cases.md (10 worked examples)
-|       +-- High evidence (score 8-10)
-|       +-- Medium evidence (score 5-7)
-|       +-- Low evidence (score 0-4)
-|       +-- Edge cases (sensitive, timestamps, etc.)
-|
-+-- references/
-    +-- evidence-scoring-details.md
-        +-- Complete scoring formulas
-        +-- Routing logic (DROP/TENTATIVE/ACTIVE)
-        +-- Mathematical basis
-```
-
-## Documentation
-
-- **[Architecture Guide](docs/SKILLS_ARCHITECTURE_DIAGRAM.md)** - How skills work in Letta
-- **[Setup Guide](docs/CLOUD_AGENT_SKILLS_SETUP.md)** - Step-by-step configuration
-- **[Quick Setup](docs/setup_guide.txt)** - Copy-paste instructions
-
-## Research Citation
-
-This implementation is based on:
-
-> Fernandes, M. A., Wammes, J. D., & Meade, M. E. (2018). **The Surprisingly Powerful Influence of Drawing on Memory**. *Current Directions in Psychological Science*, 27(5), 302-308. https://doi.org/10.1177/0963721418755385
-
-**Key Findings Applied:**
-- Drawing creates integrated memory traces (elaboration + motor + pictorial)
-- Motor execution is critical (agent must generate, not read)
-- Retrieval benefits from context reinstatement (scene reconstruction)
-- Distinctiveness through varied metaphors improves recall
-
-## Technical Details
-
-### Agent Skills Standard Compliance
-
-This skill follows the [Agent Skills open standard](https://agentskills.io/):
-- [x] YAML frontmatter (name, description)
-- [x] Progressive disclosure (metadata -> instructions -> resources)
-- [x] Cross-platform compatible (Letta, Claude, Cursor, VS Code, etc.)
-- [x] Bundled resources (examples, references)
-
-### Memory Blocks Required
-
-**`skills`** (read-only):
-- Catalog of available skills
-- Always in context (~1K tokens)
-- Contains skill IDs, descriptions, directory path
-
-**`loaded_skills`** (read-only):
-- Full content of active skills
-- Empty until loaded
-- Populated by Skill tool (client-side)
-
-### Evidence Scoring
-
-The skill uses a 5-dimension evidence scoring system (0-12 points):
-
-1. **Frequency** (0-3): Number of mentions
-2. **Source Quality** (0-3): Explicit > Implicit > Inferred
-3. **Clarity** (0-2): Unambiguous vs vague
-4. **Consistency** (0-2): No contradictions
-5. **Stability** (0-2): Temporal persistence
-
-**Routing**:
-- **8-12 points** -> ACTIVE (high confidence, store immediately)
-- **5-7 points** -> ACTIVE (medium confidence, acceptable)
-- **0-4 points** -> TENTATIVE or DROP (insufficient evidence)
-
-## Comparison: Skill vs Tool
-
-| Feature | Tool (process_memory_v4) | Skill (drawing-memory) |
-|---------|-------------------------|------------------------|
-| **Context** | Always loaded | Load only when needed |
-| **Format** | Rigid JSON schema | Flexible natural language |
-| **Agent Role** | PASSIVE (calls function) | ACTIVE (generates content) |
-| **Thresholds** | Rigid (score >= 8) | Flexible (5-7 acceptable) |
-| **Motor Component** | Auto-generated | Agent generates |
-| **Retrieval** | No guidance | Scene reconstruction |
-| **Examples** | None | 14 worked examples |
-| **Iteration Speed** | 30 min (redeploy) | 5 min (edit SKILL.md) |
-
-## Empirical Validation
-
-Evaluated on LongMemEval-S (LME-S): 4,575 real conversation sessions, 100
-structured recall questions, GPT-4o graded against ground-truth oracle.
-
-Controlled comparison: C6 (dual-trace: fact + scene) vs C7 (fact-only,
-identical coverage and format). C7 isolates the scene contribution.
-
-| Metric | C7 (fact-only) | C6 (dual-trace) | Scene contribution |
-|---|---|---|---|
-| Overall | 54% | **73.7%** | **+19.7pp** |
-| Single-session | 79% | 79% | 0pp (null -- expected) |
-| Multi-session | 43% | **65.5%** | +22.2pp |
-| Knowledge-update | 59% | **81.8%** | +22.7pp |
-| Temporal-reasoning | 38% | **70.8%** | **+33.3pp** |
-
-The single-session null result is mechanistically meaningful: scenes contribute
-specifically when memory must be aggregated, sequenced, or resolved -- not when
-a single lookup suffices. This matches episodic encoding theory exactly.
-
-Full performance ladder (LME-S benchmark, SOTA = 84-86%):
-
-| Condition | Overall | Description |
-|---|---|---|
-| Vanilla (no memory) | ~9% | No stored sessions |
-| Basic archival | 48% | Selective storage, older format |
-| Fact-only (C7) | 54% | High coverage + clean format |
-| **Dual-trace (C6)** | **73.7%** | **C7 + scene files** |
-| SOTA | 84-86% | BM25 + dense + reranking |
-
-See `skills/drawing-memory/references/worked-examples.md` for three annotated
-real-world examples from the evaluation showing each mechanism in action.
-
-## Contributing
-
-Contributions welcome! This skill can be improved through:
-- Additional metaphor types
-- Refined evidence scoring
-- Enhanced retrieval strategies
-- Cross-platform testing
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Acknowledgments
-
-- Research foundation: Fernandes, Wammes, & Meade (2018)
-- Agent Skills standard: [agentskills.io](https://agentskills.io/)
-- Built for [Letta](https://letta.com/) AI agent platform
+Research-backed memory encoding for `letta_v1_agent` -- validated at +19.7
+percentage points overall accuracy on LongMemEval-S versus fact-only encoding.
 
 ---
 
-**Status**: [x] Empirically validated (LME-S controlled evaluation, March 2026)
+## What It Does
 
-**Version**: 2.0.0
+When a user shares personal information, the agent stores two linked traces in
+archival memory rather than one:
 
-**Last Updated**: March 2026
+  [FACT:anchor] -- a structured third-person paraphrase preserving all
+  components of the information. Optimized for compositional accuracy.
+
+  [SCENE:anchor] -- a distinctive visual scene with temporal anchors embedding
+  the information as a visible label or quote. Optimized for recollection,
+  temporal sequencing, and multi-session aggregation.
+
+At retrieval time, the agent uses archival_memory_search to find both traces
+and synthesizes a confident, context-rich answer.
+
+The dual-trace approach is inspired by the drawing effect (Fernandes et al.,
+2018): encoding the same information in two representational formats produces
+stronger, more distinctive memory traces than encoding it once.
+
+---
+
+## Empirical Validation
+
+Evaluated on LongMemEval-S: 4,575 real user conversation sessions used as a
+teach corpus, 100 structured recall questions, 4,575-session distractor
+haystack, GPT-4o graded against ground-truth oracle (March 2026).
+
+Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Both conditions
+used identical evidence rates (~63-65%), identical archival passage format,
+and the same letta_v1_agent architecture. The only variable was the presence
+or absence of scene traces.
+
+| Question type      | C7 fact-only | C6 dual-trace | Scene contribution |
+|--------------------|--------------|---------------|--------------------|
+| Overall            | 54%          | 73.7%         | +19.7 pp           |
+| Single-session     | 79%          | 79%           | 0 pp (null)        |
+| Multi-session      | 43%          | 65.5%         | +22.2 pp           |
+| Knowledge-update   | 59%          | 81.8%         | +22.7 pp           |
+| Temporal-reasoning | 38%          | 70.8%         | +33.3 pp           |
+
+The single-session null result is expected and meaningful: scenes do not help
+when a single lookup suffices. Scenes contribute specifically when memory must
+be aggregated across sessions, sequenced in time, or resolved when conflicting
+entries exist. This matches episodic encoding theory.
+
+Full performance ladder (LME-S benchmark):
+
+| Condition               | Overall | Description                         |
+|-------------------------|---------|-------------------------------------|
+| Vanilla (no memory)     | ~9%     | No stored sessions                  |
+| Basic archival (C4)     | 48%     | Selective storage, older format     |
+| Fact-only (C7)          | 54%     | High coverage + clean anchor format |
+| Dual-trace (C6)         | 73.7%   | C7 + scene traces                   |
+| SOTA (published)        | 84-86%  | BM25 + dense retrieval + reranking  |
+
+See skills/drawing-memory/references/worked-examples.md for three annotated
+real-world examples showing each retrieval mechanism in action.
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- A Letta account at app.letta.com (or a self-hosted Letta server)
+- Python 3.9+ with the Letta Python SDK: `pip install letta-client`
+- Git
+
+### Step 1 -- Clone this repository
+
+```bash
+git clone https://github.com/sternb12/agent_draw_skills.git
+cd agent_draw_skills
+```
+
+### Step 2 -- Create a letta_v1_agent
+
+Create an agent via the Python SDK. Copy the persona from the skill file:
+
+```python
+from letta_client import Letta
+
+client = Letta(api_key="your-api-key")
+
+# Read the skill content
+with open("skills/drawing-memory/SKILL.md") as f:
+    skill_content = f.read()
+
+agent = client.agents.create(
+    name="my-dual-trace-agent",
+    agent_type="letta_v1_agent",
+    model="anthropic/claude-sonnet-4-6",
+    memory_blocks=[
+        {
+            "label": "system/persona",
+            "value": skill_content
+        }
+    ],
+    tools=[
+        "archival_memory_insert",
+        "archival_memory_search",
+        "memory_replace",
+        "conversation_search"
+    ]
+)
+
+print(f"Agent created: {agent.id}")
+```
+
+### Step 3 -- Send a session (encode)
+
+```python
+response = client.agents.messages.create(
+    agent_id=agent.id,
+    messages=[{
+        "role": "user",
+        "content": "Hi, I'm Sarah. I'm a physical therapist in Boston "
+                   "specializing in ACL rehab. I just ran my fourth marathon."
+    }]
+)
+print(response.messages[-1].content)
+# Agent scores evidence, routes to FULL, and calls archival_memory_insert
+# with a [FACT:work-occupation] + [SCENE:work-occupation] passage.
+```
+
+### Step 4 -- Ask a recall question
+
+```python
+response = client.agents.messages.create(
+    agent_id=agent.id,
+    messages=[{
+        "role": "user",
+        "content": "What do you know about my work?"
+    }]
+)
+print(response.messages[-1].content)
+# Agent calls archival_memory_search("work-occupation"), finds FACT + SCENE,
+# and returns a confident answer with context.
+```
+
+### Step 5 -- Verify what was stored
+
+```python
+passages = list(client.agents.passages.list(agent_id=agent.id))
+facts  = sum(1 for p in passages if "[FACT:"  in (p.text or ""))
+scenes = sum(1 for p in passages if "[SCENE:" in (p.text or ""))
+print(f"{len(passages)} passages ({facts} FACT, {scenes} SCENE)")
+```
+
+---
+
+## Architecture
+
+**Agent type:** `letta_v1_agent`
+
+**Tools required:**
+- `archival_memory_insert` -- stores [FACT:anchor] + [SCENE:anchor] passages
+- `archival_memory_search` -- retrieves passages by anchor label
+- `memory_replace` -- updates persona block if needed
+- `conversation_search` -- optional, for searching recent message history
+
+**Memory structure:** All encoded information lives in archival memory as
+passages containing [FACT:anchor] and [SCENE:anchor] text tags. No additional
+memory blocks or file system access required. The skill instructions live in
+the system/persona block.
+
+**Evidence gate:** The agent scores each incoming session on three dimensions
+(Relevance, Specificity, Explicitness, 0-6 total). Sessions scoring 0-2 are
+dropped. Sessions scoring 3-6 trigger dual-trace encoding.
+
+**Passage format:**
+```
+[FACT:anchor]
+{structured third-person paraphrase}
+
+[SCENE:anchor]
+Picture: {concrete object + distinctive mark + embedded key text}
+Sketch steps: (1) Draw {object}, (2) Add {mark}, (3) Embed "{quote}"
+(Mnemonic depiction only. Not evidence.)
+```
+
+---
+
+## Repository Structure
+
+```
+agent_draw_skills/
++-- README.md                          <- this file
++-- skills/
+    +-- drawing-memory/
+        +-- SKILL.md                   <- encoding + retrieval instructions
+        +-- references/
+            +-- worked-examples.md     <- 3 annotated LME-S examples
+            +-- evidence-scoring-details.md
+            +-- token-analysis.md      <- C6 vs C7 cost comparison
+```
+
+---
+
+## Research Citation
+
+Fernandes, M. A., Wammes, J. D., & Meade, M. E. (2018). The surprisingly
+powerful influence of drawing on memory. Current Directions in Psychological
+Science, 27(5), 302-308. https://doi.org/10.1177/0963721418755385
+
+---
+
+## Notes
+
+This repository implements the archival memory (letta_v1_agent) version of
+dual-trace encoding, which corresponds to the C6 condition evaluated on
+LME-S (73.7% overall accuracy).
+
+A separate file-based implementation for Letta Code agents (which uses
+Write/Read/Glob tools and the agent memory filesystem rather than archival
+memory) is available at: https://github.com/sternb12/letta-code-draw-skill
+
+---
+
+**Version:** 3.0.0
+**Last validated:** March 2026 (LME-S controlled evaluation)
+**License:** MIT
