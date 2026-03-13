@@ -3,6 +3,7 @@
 Research-backed memory encoding for `letta_v1_agent` -- validated at +19.7
 percentage points overall accuracy on LongMemEval-S versus fact-only encoding.
 
+
 ---
 
 ## What It Does
@@ -225,6 +226,9 @@ LME-S (73.7% overall accuracy).
 A separate file-based implementation for Letta Code agents (which uses
 Write/Read/Glob tools and the agent memory filesystem rather than archival
 memory) is available at: https://github.com/sternb12/letta-code-draw-skill
+
+- This creation and organization of this repository was accomplished with
+  assistance from a Letta Code agent.
 
 ---
 

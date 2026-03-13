@@ -1,4 +1,4 @@
-# Real-World Examples: Dual-Trace Memory in Action
+# Real-World Examples
 
 These three examples are drawn from a controlled evaluation of the dual-trace
 encoding approach on LongMemEval-S (LME-S), a standardized benchmark of 4,575
