@@ -11,11 +11,11 @@ accuracy vs 54% for the fact-only control (C7), a +19.7 percentage point gain.
 The approach is inspired by the drawing effect (Fernandes et al., 2018) and
 works by forcing elaborative encoding: each piece of information is stored as
 two linked archival passages -- a structured fact trace and a vivid scene trace
-with concrete imageable detail. The mechanism is elaborative generation, not
-motor encoding. The agent generates the scene text itself, which produces richer
-encoding than receiving pre-computed output, but this is distinct from the
-motor component of human drawing (visuospatial planning, fine motor control,
-perceptual feedback).
+with concrete imageable detail. The mechanism is elaborative generation, not the motor encoding component
+described in Fernandes et al. (2018). The agent generates the scene text
+itself, which produces richer encoding than receiving pre-computed output,
+but this is distinct from the motor component of human drawing (visuospatial
+planning, fine motor control, perceptual feedback).
 
 ## Architecture
 
