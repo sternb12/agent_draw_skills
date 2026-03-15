@@ -66,7 +66,65 @@ real-world examples showing each retrieval mechanism in action.
 
 ---
 
+## What It Looks Like
+
+A user tells the agent about two hobby projects in separate sessions:
+
+  Session A: "I've been building a 1/48 scale Japanese Zero fighter -- started
+  it a few weeks ago, the fuselage halves are joined and decals are soaking."
+
+  Session B (later): "Spent all of rainy Sunday on my Ferrari 288 GTO model.
+  About 5 hours on the chassis and engine block -- May 7th, so it's brand new."
+
+The agent encodes Session B as:
+
+  [FACT:hobby-scale-modeling]
+  The user builds scale models. Current projects: a Ferrari 288 GTO (started
+  approximately May 7, 2023) and a 1/48 scale Japanese Zero WWII fighter
+  (started approximately late April 2023). The Zero was started first.
+
+  [SCENE:hobby-scale-modeling]
+  Picture: A rainy Sunday, May 7, 2023. Dining room table cleared and covered
+  with newspaper. The Ferrari 288 GTO box is open -- sprue frames laid out,
+  instruction booklet propped against a coffee mug. The Japanese Zero kit is
+  already on a nearby shelf, partially assembled from a few weeks before --
+  fuselage halves joined, decals soaking in a bowl of water.
+  Sketch steps: (1) Draw cleared dining table on a rainy Sunday with Ferrari
+  kit open, sprues laid out, (2) Add shelf in background with Zero already
+  partially assembled, (3) Embed "May 7" on wall calendar and "late April"
+  on sticky note beside the Zero.
+  (Mnemonic depiction only. Not evidence.)
+
+Later, at recall time:
+
+  User: "Which project did I start first, the Ferrari model or the Japanese
+  Zero fighter plane model?"
+
+  Agent: "You started the Ferrari 288 GTO first.
+  According to my records, you began the Ferrari 288 GTO on approximately
+  May 7, 2023...
+  Wait -- that would actually make the Japanese Zero the first, as late
+  April 2023 precedes May 7, 2023. So to be precise:
+    Japanese Zero (1/48 scale): started ~late April 2023 -- first
+    Ferrari 288 GTO: started ~May 7, 2023 -- second
+  You started the Japanese Zero fighter plane first, roughly a week or two
+  before you began the Ferrari model."
+
+The agent initially retrieves the Ferrari passage first (search order) and
+starts to answer incorrectly. The scene's concrete date -- "a rainy Sunday,
+May 7, 2023" -- is specific enough to function as a timestamp. Cross-checking
+it against the Zero's "late April" anchor triggers real-time self-correction.
+A fact trace alone, with two approximate dates, would not reliably resolve
+the sequencing. This question type (+33.3pp gain) is where scenes matter most.
+
+---
+
 ## Quick Start
+
+> **No Python? No problem.** If you prefer a no-code setup, see
+> `docs/ade-quick-start.md` -- copy-paste the persona into a new agent at
+> app.letta.com and you are running in under 5 minutes. The SDK path below
+> is for programmatic or batch use.
 
 ### Prerequisites
 
@@ -198,14 +256,38 @@ Sketch steps: (1) Draw {object}, (2) Add {mark}, (3) Embed "{quote}"
 ```
 agent_draw_skills/
 +-- README.md                          <- this file
++-- CLAUDE.md                          <- guidance for AI coding assistants
++-- docs/
+|   +-- ade-quick-start.md             <- no-code ADE setup (no Python required)
 +-- skills/
     +-- drawing-memory/
         +-- SKILL.md                   <- encoding + retrieval instructions
         +-- references/
             +-- worked-examples.md     <- 3 annotated LME-S examples
-            +-- evidence-scoring-details.md
             +-- token-analysis.md      <- C6 vs C7 cost comparison
 ```
+
+---
+
+## Reproducing the Evaluation
+
+The LME-S results were produced using:
+
+- **Dataset:** LongMemEval (Zhang et al., 2024) -- 4,575 real user conversation
+  sessions and 100 structured recall questions with ground-truth answers.
+  Available at: https://huggingface.co/datasets/xiaowu0162/longmemeval
+
+- **Evaluation harness:** letta-evals 0.9.0
+  Install: `pip install letta-evals`
+  Documentation: https://github.com/letta-ai/letta-evals
+
+- **Grading:** GPT-4o against the LongMemEval oracle (longmemeval_oracle.json,
+  included in the dataset). Teach phase: all 4,575 sessions sent sequentially.
+  Recall phase: 100 questions against the full distractor haystack.
+
+- **Conditions:** C6 (dual-trace, this skill) vs C7 (fact-only control).
+  Both used identical letta_v1_agent setup and claude-sonnet-4-6.
+  Only variable: presence or absence of [SCENE:anchor] passages.
 
 ---
 
