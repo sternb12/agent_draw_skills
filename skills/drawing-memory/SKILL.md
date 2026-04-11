@@ -38,11 +38,12 @@ Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Identical evidence
 rates (~63-65%), identical archival passage format, same letta_v1_agent
 architecture. Only variable: presence or absence of scene traces.
 
-  Overall:            +19.7 percentage points (pp), (73.7% vs 54%)
-  Temporal-reasoning: +33.3 pp -- scene anchors enable temporal sequencing
-  Knowledge-update:   +22.7 pp -- scene weight signals which state is current
-  Multi-session:      +22.2 pp -- scenes bind scattered passages into threads
-  Single-session:       0 pp  -- null result (expected, mechanistically meaningful)
+  Overall:            +20.2 percentage points (pp) (73.7% vs 53.5%)
+                      95% CI [+12, +29], bootstrap p < 0.0001
+  Temporal-reasoning: +40 pp -- scene anchors enable temporal sequencing
+  Knowledge-update:   +25 pp -- scene weight signals which state is current
+  Multi-session:      +30 pp -- scenes bind scattered passages into threads
+  Single-session:       0 pp -- null result (expected, mechanistically meaningful)
 
 The single-session null result is the mechanistic fingerprint: scenes contribute
 specifically when memory must be aggregated, sequenced, or resolved across
@@ -217,9 +218,9 @@ Three annotated real-world examples from the LME-S evaluation are in:
   references/worked-examples.md
 
 They show the three mechanisms where scenes provide the largest benefit:
-  1. Multi-session aggregation (+22.2 pp) -- scene as contextual binding cue
-  2. Knowledge-update (+22.7 pp) -- scene emotional weight signals current state
-  3. Temporal reasoning (+33.3 pp) -- scene enables self-correction via date anchor
+  1. Multi-session aggregation (+30 pp) -- scene as contextual binding cue
+  2. Knowledge-update (+25 pp) -- scene emotional weight signals current state
+  3. Temporal reasoning (+40 pp) -- scene enables self-correction via date anchor
 
 ---
 

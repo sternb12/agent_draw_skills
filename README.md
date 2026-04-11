@@ -1,6 +1,6 @@
 # Dual-Trace Memory Skill for Letta Agents
 
-Research-backed memory encoding for `letta_v1_agent` -- validated at +19.7
+Research-backed memory encoding for `letta_v1_agent` -- validated at +20.2
 percentage points overall accuracy on LongMemEval-S versus fact-only encoding.
 
 
@@ -38,28 +38,35 @@ used identical evidence rates (~63-65%), identical archival passage format,
 and the same letta_v1_agent architecture. The only variable was the presence
 or absence of scene traces.
 
-| Question type      | C7 fact-only | C6 dual-trace | Scene contribution |
-|--------------------|--------------|---------------|--------------------|
-| Overall            | 54%          | 73.7%         | +19.7 pp           |
-| Single-session     | 79%          | 79%           | 0 pp (null)        |
-| Multi-session      | 43%          | 65.5%         | +22.2 pp           |
-| Knowledge-update   | 59%          | 81.8%         | +22.7 pp           |
-| Temporal-reasoning | 38%          | 70.8%         | +33.3 pp           |
+Paired analysis over 99 questions common to both conditions (bootstrap CIs,
+10,000 resamples; GPT-4o graded against ground-truth oracle):
+
+| Question type      | C7 fact-only | C6 dual-trace | Scene contribution | 95% CI     | p       |
+|--------------------|--------------|---------------|--------------------|------------|---------|
+| Overall            | 53.5%        | 73.7%         | +20.2 pp           | [+12, +29] | <0.0001 |
+| Single-session     | 75%          | 75%           | 0 pp (null)        | [-15, +15] | 0.657   |
+| Multi-session      | 20%          | 50%           | +30 pp             | [+10, +50] | 0.001   |
+| Knowledge-update   | 55%          | 80%           | +25 pp             | [+10, +45] | 0.003   |
+| Temporal-reasoning | 25%          | 65%           | +40 pp             | [+15, +65] | 0.002   |
 
 The single-session null result is expected and meaningful: scenes do not help
 when a single lookup suffices. Scenes contribute specifically when memory must
 be aggregated across sessions, sequenced in time, or resolved when conflicting
 entries exist. This matches episodic encoding theory.
 
+Per-question analysis: 22 questions answered correctly by C6 but missed by
+C7, versus only 2 in the reverse direction (McNemar's chi-squared = 15.04,
+p < 0.001).
+
 Full performance ladder (LME-S benchmark):
 
-| Condition               | Overall | Description                         |
-|-------------------------|---------|-------------------------------------|
-| Vanilla (no memory)     | ~9%     | No stored sessions                  |
-| Basic archival (C4)     | 48%     | Selective storage, older format     |
-| Fact-only (C7)          | 54%     | High coverage + clean anchor format |
-| Dual-trace (C6)         | 73.7%   | C7 + scene traces                   |
-| SOTA (published)        | 84-86%  | BM25 + dense retrieval + reranking  |
+| Condition               | Overall | Description                          |
+|-------------------------|---------|--------------------------------------|
+| Vanilla (no memory)     | 20.0%   | Correct abstention only, no recall   |
+| Basic archival (C4)     | 48%     | Selective storage, older format      |
+| Fact-only (C7)          | 53.5%   | High coverage + clean anchor format  |
+| Dual-trace (C6)         | 73.7%   | C7 + scene traces                    |
+| SOTA (published)        | 84-86%  | BM25 + dense retrieval + reranking   |
 
 See skills/drawing-memory/references/worked-examples.md for three annotated
 real-world examples showing each retrieval mechanism in action.
@@ -115,7 +122,7 @@ starts to answer incorrectly. The scene's concrete date -- "a rainy Sunday,
 May 7, 2023" -- is specific enough to function as a timestamp. Cross-checking
 it against the Zero's "late April" anchor triggers real-time self-correction.
 A fact trace alone, with two approximate dates, would not reliably resolve
-the sequencing. This question type (+33.3pp gain) is where scenes matter most.
+the sequencing. This question type (+40pp gain) is where scenes matter most.
 
 ---
 
@@ -288,6 +295,52 @@ The LME-S results were produced using:
 - **Conditions:** C6 (dual-trace, this skill) vs C7 (fact-only control).
   Both used identical letta_v1_agent setup and claude-sonnet-4-6.
   Only variable: presence or absence of [SCENE:anchor] passages.
+
+---
+
+## Coding Agent Adaptation
+
+Software engineering is a natural extension domain: design decisions carry
+rationale that may be forgotten, debugging incidents unfold as temporal
+narratives, and developer understanding evolves over time. These are information
+types where scene traces add retrieval value for the same reasons they help in
+personal memory.
+
+The adaptation extends dual-trace encoding to Letta Code agents with a
+git-backed memory filesystem. The design principle is to extend, not replace:
+scene traces are added on top of existing fact storage without disrupting
+existing workflows.
+
+Two key changes from the personal memory version:
+
+Evidence scoring expands from three conversational dimensions (0-6) to four
+code-specific dimensions (each 0-3, total 0-12): durability (how long will this
+matter?), scope (how much of the codebase does it affect?), rationale-richness
+(was reasoning and tradeoffs stated?), and retrieval likelihood (how often will
+this be needed?). Routing uses three tiers: SKIP (0-4, native memory only),
+RECORD (5-7, fact entry without scene), and FULL (8-12, fact + scene).
+
+Scene vocabulary shifts from "Picture:" (visual-spatial metaphors anchored to
+objects and settings) to "Moment:" (narrative reconstructions anchored to
+concrete code artifacts -- file paths, function names, error messages, PR
+descriptions). Each coding scene includes Timeline, Prior, and After fields for
+temporal sequencing of decisions and incidents.
+
+Six information types are supported: decisions (architectural choices with
+rationale and alternatives), incidents (bugs and their root causes), conventions
+(rules that emerged from specific experiences), patterns (recurring developer
+behaviors), learning progressions (skill development over time), and preferences
+(workflow habits with origin stories).
+
+Pilot validation (March 2026, four manual tests on a Letta Code agent):
+the evidence gate correctly discriminated low-score preferences from high-score
+architectural decisions. State A retrieval and State C abstention functioned as
+designed. An update to a previously stored incident correctly modified the
+existing entry rather than creating a duplicate.
+
+The full design -- scoring rubric, scene vocabulary, information-type
+specifications, and pilot test results -- is documented in the companion
+repository: https://github.com/sternb12/letta-code-draw-skill
 
 ---
 
