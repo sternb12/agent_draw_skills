@@ -33,10 +33,10 @@ Evaluated on LongMemEval-S: 4,575 real user conversation sessions used as a
 teach corpus, 100 structured recall questions, 4,575-session distractor
 haystack, GPT-4o graded against ground-truth oracle (March 2026).
 
-Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Both conditions
-used identical evidence rates (~63-65%), identical archival passage format,
-and the same letta_v1_agent architecture. The only variable was the presence
-or absence of scene traces.
+Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Both conditions used the same letta_v1_agent architecture and identical
+archival passage format. Session encoding rates were comparable: C6 encoded
+54.8% of sessions; C7 encoded 57.4%. The only variable was the presence or
+absence of scene traces.
 
 Paired analysis over 99 questions common to both conditions (bootstrap CIs,
 10,000 resamples; GPT-4o graded against ground-truth oracle):
@@ -63,7 +63,7 @@ Full performance ladder (LME-S benchmark):
 | Condition               | Overall | Description                          |
 |-------------------------|---------|--------------------------------------|
 | Vanilla (no memory)     | 20.0%   | Correct abstention only, no recall   |
-| Basic archival (C4)     | 48%     | Selective storage, older format      |
+| Basic archival (C4)     | 47.5%   | Selective storage, older format      |
 | Fact-only (C7)          | 53.5%   | High coverage + clean anchor format  |
 | Dual-trace (C6)         | 73.7%   | C7 + scene traces                    |
 | SOTA (published)        | 84-86%  | BM25 + dense retrieval + reranking   |
@@ -280,7 +280,7 @@ agent_draw_skills/
 
 The LME-S results were produced using:
 
-- **Dataset:** LongMemEval (Zhang et al., 2024) -- 4,575 real user conversation
+- **Dataset:** LongMemEval (Wang et al., 2024) -- 4,575 real user conversation
   sessions and 100 structured recall questions with ground-truth answers.
   Available at: https://huggingface.co/datasets/xiaowu0162/longmemeval
 

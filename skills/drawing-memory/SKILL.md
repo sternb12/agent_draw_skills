@@ -35,8 +35,9 @@ corpus, 100 structured recall questions, 4,575-session distractor haystack,
 GPT-4o graded against ground-truth oracle (March 2026, claude-sonnet-4-6).
 
 Controlled comparison: C6 (dual-trace) vs C7 (fact-only). Identical evidence
-rates (~63-65%), identical archival passage format, same letta_v1_agent
-architecture. Only variable: presence or absence of scene traces.
+and identical archival passage format. Session encoding rates were
+comparable: C6 encoded 54.8% of sessions; C7 encoded 57.4%. Only variable:
+presence or absence of scene traces.
 
   Overall:            +20.2 percentage points (pp) (73.7% vs 53.5%)
                       95% CI [+12, +29], bootstrap p < 0.0001
