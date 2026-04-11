@@ -58,7 +58,7 @@ memory tools:
 
   archival_memory_insert  -- stores the [FACT:anchor] + [SCENE:anchor] passage
   archival_memory_search  -- retrieves passages by anchor label at recall time
-  memory_replace          -- updates persona block if needed
+  memory_replace          -- updates the system/persona block if needed
   conversation_search     -- searches recent message history
 
 No file system access, no Write tool, no git operations. All encoded information

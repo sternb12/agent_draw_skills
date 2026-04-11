@@ -233,7 +233,7 @@ print(f"{len(passages)} passages ({facts} FACT, {scenes} SCENE)")
 **Tools required:**
 - `archival_memory_insert` -- stores [FACT:anchor] + [SCENE:anchor] passages
 - `archival_memory_search` -- retrieves passages by anchor label
-- `memory_replace` -- updates persona block if needed
+- `memory_replace` -- updates the system/persona block if needed
 - `conversation_search` -- optional, for searching recent message history
 
 **Memory structure:** All encoded information lives in archival memory as
