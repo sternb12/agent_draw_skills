@@ -272,6 +272,7 @@ agent_draw_skills/
         +-- references/
             +-- worked-examples.md     <- 3 annotated LME-S examples
             +-- token-analysis.md      <- C6 vs C7 cost comparison
+            +-- edge-cases.md          <- edge case handling
 ```
 
 ---

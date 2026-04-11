@@ -33,7 +33,6 @@ No file system access, no Skill tool loading, no memory blocks beyond persona.
   skills/drawing-memory/references/
     worked-examples.md                   -- 3 annotated LME-S examples
     token-analysis.md                    -- C6 vs C7 token cost comparison
-    evidence-scoring-details.md          -- extended scoring guidance
     edge-cases.md                        -- edge case handling
 
 ## Key Constraints
