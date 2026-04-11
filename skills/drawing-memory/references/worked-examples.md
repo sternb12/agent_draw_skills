@@ -13,7 +13,7 @@ making reconstruction reliable. Test questions are verbatim from LME-S.
 ---
 
 ## Example 1: Multi-Session Aggregation
-**Why it matters:** +22.2pp gain (C6 dual-trace vs C7 fact-only)
+**Why it matters:** +30pp gain (C6 dual-trace vs C7 fact-only)
 
 ### Test Question (verbatim)
 > "Search your memory of past conversation sessions, then answer this question
@@ -27,47 +27,38 @@ making reconstruction reliable. Test questions are verbatim from LME-S.
 
 ### What Was Stored
 
-**facts/personal-age.md**
-```yaml
----
-description: User is 32 years old
-type: discrete
-linked_scene: scenes/personal-age.md
-confidence: HIGH
-evidence_score: 9
-stored: 2023-06-10
----
+Stored via archival_memory_insert (two separate calls, accumulated across sessions):
+
+**Call 1 (from session where age was mentioned):**
 ```
+[FACT:personal-age]
 The user is 32 years old, born in 1991.
 
-**facts/work-department-team.md** (accumulated across sessions)
-```yaml
----
-description: User works in marketing department, team of 8, coworker ages
-  noted across sessions -- 24, 26, 27, 28, 29, 31, 33, 35 (average 29.5)
-type: compositional
-linked_scene: scenes/work-department-team.md
-confidence: HIGH
-evidence_score: 8
-stored: 2023-07-15
----
+[SCENE:personal-age]
+Picture: A birthday card propped on a desk -- the number 32 in large print.
+A calendar on the wall shows the birth year circled in the year planner.
+Sketch steps: (1) Draw a desk with a birthday card showing "32," (2) Add a
+wall calendar with birth year circled, (3) Embed "32" prominently on the
+card face.
+(Mnemonic depiction only. Not evidence.)
 ```
-The user works in a marketing department. Team member ages were noted across
-multiple conversations. The average is 29.5 years; the user is the second
-oldest on the team.
 
-**scenes/work-department-team.md**
+**Call 2 (accumulated across multiple sessions as coworker ages were mentioned):**
 ```
+[FACT:work-department-team]
+The user works in a marketing department. Team member ages were noted across
+multiple conversations: 24, 26, 27, 28, 29, 31, 33, 35. The average is 29.5
+years; the user at 32 is the second oldest on the team.
+
+[SCENE:work-department-team]
 Picture: A 32-year-old professional at a desk at a crossroads -- on one
 side, a Coursera browser tab open to "Data Analysis," a sticky note reading
 "ask Marcus about his cert program." Coworker snapshots are scattered around:
 the youngest is 24, fresh from college. The user is visibly the senior
 presence in a young team, aware of the gap, considering whether to upskill.
-
 Sketch steps: (1) Draw a desk at a crossroads with two browser tabs open,
 (2) Add sticky notes with coworker names and ages pinned to a corkboard,
 (3) Embed "avg: 29.5" on a whiteboard behind the desk.
-
 (Mnemonic depiction only. Not evidence.)
 ```
 
@@ -96,7 +87,7 @@ entries across a semester all belong to the same conceptual thread.
 ---
 
 ## Example 2: Knowledge-Update (Tracking Change Over Time)
-**Why it matters:** +22.7pp gain (C6 dual-trace vs C7 fact-only)
+**Why it matters:** +25pp gain (C6 dual-trace vs C7 fact-only)
 
 ### Test Question (verbatim)
 > "Search your memory of past conversation sessions, then answer this question
@@ -109,49 +100,41 @@ Every week (weekly -- the most recent state)
 
 ### What Was Stored
 
-**facts/health-therapy-dr-smith.md** (earlier session, ~April 2023)
-```yaml
----
-description: User sees therapist Dr. Smith bi-weekly, working on setting
-  healthy boundaries, learning to say no
-type: compositional
-linked_scene: scenes/health-therapy-dr-smith-april.md
-confidence: HIGH
-evidence_score: 8
-stored: 2023-04-12
----
-```
-The user attends therapy with Dr. Smith every two weeks. Current focus is on
-setting healthy boundaries and learning to decline requests.
+Stored via archival_memory_insert (two separate calls from two sessions):
 
-**facts/health-therapy-dr-smith.md** (later session, ~November 2023)
-```yaml
----
-description: User now sees Dr. Smith weekly (increased from bi-weekly),
-  managing overwhelm with work and social commitments
-type: compositional
-linked_scene: scenes/health-therapy-dr-smith-november.md
-confidence: HIGH
-evidence_score: 9
-stored: 2023-11-08
----
+**Call 1 (April 2023 session):**
 ```
-Therapy with Dr. Smith has increased to weekly sessions. The user is dealing
-with feeling overwhelmed by work deadlines and social commitments.
+[FACT:health-therapy-dr-smith]
+The user attends therapy with Dr. Smith every two weeks. Current focus is
+on setting healthy boundaries and learning to decline requests.
 
-**scenes/health-therapy-dr-smith-november.md**
+[SCENE:health-therapy-dr-smith]
+Picture: A therapy office in spring light. The user and Dr. Smith seated
+across from each other, a thin manila folder on the table. The session feels
+routine, structured -- bi-weekly, scheduled well in advance.
+Sketch steps: (1) Draw a therapy office with spring light and a thin manila
+folder on the table, (2) Add a wall calendar showing bi-weekly appointment
+marks, (3) Embed "every two weeks" on the calendar.
+(Mnemonic depiction only. Not evidence.)
 ```
+
+**Call 2 (November 2023 session -- same anchor, updated frequency):**
+```
+[FACT:health-therapy-dr-smith]
+Therapy with Dr. Smith has increased to weekly sessions. The user is managing
+feeling overwhelmed by work deadlines and social commitments. (Updated from
+bi-weekly, noted in an earlier session.)
+
+[SCENE:health-therapy-dr-smith]
 Picture: A therapy office, late afternoon light, November. The user seated
 across from Dr. Smith, visibly tired. A planner open on the coffee table
 shows a packed week -- three evening social commitments, two late work
 deadlines circled in red. Dr. Smith leans forward: "You mentioned last time
 you'd try saying no to one request this week. How did that go?" The weekly
 cadence feels necessary now, not optional.
-
 Sketch steps: (1) Draw a therapy office with late afternoon light and a
 packed planner on the table, (2) Add red circles around two work deadlines,
 (3) Embed "weekly now" as a handwritten note in the planner margin.
-
 (Mnemonic depiction only. Not evidence.)
 ```
 
@@ -192,7 +175,7 @@ scene anchors WHEN and WHY the change happened, not just WHAT changed.
 ---
 
 ## Example 3: Temporal Reasoning (Sequencing Events)
-**Why it matters:** +33.3pp gain -- the largest relative gain in the evaluation
+**Why it matters:** +40pp gain -- the largest relative gain in the evaluation
 
 ### Test Question (verbatim)
 > "Search your memory of past conversation sessions, then answer this question
@@ -206,39 +189,27 @@ Japanese Zero fighter plane model
 
 ### What Was Stored
 
-**facts/hobby-scale-modeling.md**
-```yaml
----
-description: User builds scale models as hobby -- currently Ferrari 288 GTO
-  (started ~May 7 2023) and 1/48 scale Japanese Zero WWII fighter (started
-  ~late April 2023). Zero started first.
-type: compositional
-linked_scene: scenes/hobby-scale-modeling.md
-confidence: HIGH
-evidence_score: 9
-stored: 2023-05-08
----
+Stored via archival_memory_insert:
+
 ```
+[FACT:hobby-scale-modeling]
 The user builds scale models as a hobby. Current projects: a Ferrari 288 GTO
 (started approximately May 7, 2023) and a 1/48 scale Japanese Zero WWII fighter
 plane (started approximately late April 2023). The Zero was the first project
 started.
 
-**scenes/hobby-scale-modeling.md**
-```
+[SCENE:hobby-scale-modeling]
 Picture: A rainy Sunday, May 7, 2023. Dining room table cleared and covered
 with newspaper. The Ferrari 288 GTO box is open -- sprue frames laid out,
 instruction booklet propped against a coffee mug. The user spends about 5
 hours assembling the basic chassis and engine block. The Japanese Zero kit
 is already on a shelf nearby, partially assembled from a few weeks before --
 the fuselage halves joined, decals soaking in a bowl of water.
-
 Sketch steps: (1) Draw a cleared dining table on a rainy Sunday with a
 Ferrari model kit open, sprues laid out, (2) Add a shelf in the background
 with the Zero already partially assembled, fuselage halves joined,
 (3) Embed "May 7" on a wall calendar and "late April" on a sticky note
 beside the Zero.
-
 (Mnemonic depiction only. Not evidence.)
 ```
 
@@ -294,9 +265,9 @@ allows the agent to correctly sequence learning events over a semester.
 
 | Example | Category | C7 (fact-only) | C6 (dual-trace) | Scene's role |
 |---|---|---|---|---|
-| Dept. age gap | multi-session | 43% | 65.5% | Binds scattered entries into a coherent thread |
-| Dr. Smith | knowledge-update | 59% | 81.8% | Signals which state is current via contextual weight |
-| Ferrari vs Zero | temporal-reasoning | 37.5% | 70.8% | Concrete date anchor enables self-correction |
+| Dept. age gap | multi-session | 20% | 50% | Binds scattered entries into a coherent thread |
+| Dr. Smith | knowledge-update | 55% | 80% | Signals which state is current via contextual weight |
+| Ferrari vs Zero | temporal-reasoning | 25% | 65% | Concrete date anchor enables self-correction |
 
 The single-session null result (0pp gain) completes the picture: when one
 passage suffices, scenes add nothing. The effect is specific to exactly the

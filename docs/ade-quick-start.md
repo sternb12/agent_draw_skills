@@ -22,8 +22,8 @@ A letta_v1_agent that:
 
 This is the exact protocol used in the C6 condition of the LME-S evaluation,
 which achieved 73.7% overall accuracy on 100 structured recall questions across
-a 4,575-session distractor corpus. The fact-only baseline (C7) achieved 54%.
-The +19.7 percentage point difference is the contribution of the scene traces.
+a 4,575-session distractor corpus. The fact-only baseline (C7) achieved 53.5%.
+The +20.2 percentage point difference is the contribution of the scene traces.
 
 ---
 
@@ -151,7 +151,7 @@ Step 3 -- Synthesize from what you find:
     Use the FACT trace for the specific details. Use the SCENE trace for
     temporal context and to confirm confidence. Answer directly.
   FACT only found:
-    Answer directly from the fact trace with high confidence.
+    Answer directly from the fact trace with medium confidence.
   Nothing found:
     Respond: "I don't have that information stored."
     Do NOT guess, infer, or draw on general knowledge to fill the gap.

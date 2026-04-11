@@ -6,7 +6,7 @@ Guidance for AI coding assistants working in this repository.
 
 A dual-trace memory encoding skill for letta_v1_agent, empirically validated
 on LongMemEval-S (LME-S). The C6 condition (dual-trace) achieved 73.7% overall
-accuracy vs 54% for the fact-only control (C7), a +19.7 percentage point gain.
+accuracy vs 53.5% for the fact-only control (C7), a +20.2 percentage point gain.
 
 The approach is inspired by the drawing effect (Fernandes et al., 2018) and
 works by forcing elaborative encoding: each piece of information is stored as
